@@ -1,5 +1,6 @@
 package Task.Subclasses;
 
+import Paint.ScriptPaint;
 import Task.Task;
 import Util.BankUtil;
 import org.osbot.rs07.Bot;
@@ -20,6 +21,7 @@ public class BankTask extends Task {
 
     @Override
     public void runTask() throws InterruptedException {
+        ScriptPaint.setStatus("Banking");
         boolean canIBank = false;
         if(bank.closest() == null) {
             log("No banking entity found, attempting to WW to closest.");

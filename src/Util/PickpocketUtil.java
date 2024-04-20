@@ -1,5 +1,6 @@
 package Util;
 
+import org.osbot.rs07.api.Diaries;
 import org.osbot.rs07.api.def.NPCDefinition;
 import org.osbot.rs07.api.map.Position;
 import org.osbot.rs07.api.model.NPC;
@@ -20,10 +21,15 @@ public class PickpocketUtil {
     public static final String PICKPOCKET = "Pickpocket";
     public static List<NPCDefinition> userSelections;
 
+
     private static NPC pickpocketTarget;
 
     public static void initPickpocketUtil(List<NPCDefinition> selections) {
         PickpocketUtil.userSelections = selections;
+    }
+
+    public static NPC getPickpocketTarget() {
+        return pickpocketTarget;
     }
 
     public static int[] getSelectedNPCIds() {
@@ -72,8 +78,10 @@ public class PickpocketUtil {
         }
 
         Position pickpocketNPCPosition = pickpocketTarget.getPosition();
-        return myPlayerPosition.getZ() == pickpocketNPCPosition.getZ() &&
+        boolean isAdjacent = myPlayerPosition.getZ() == pickpocketNPCPosition.getZ() &&
                 (Math.abs(myPlayerPosition.getX() - pickpocketNPCPosition.getX()) == 1 ^ Math.abs(myPlayerPosition.getY() - pickpocketNPCPosition.getY()) == 1);
+
+        return isAdjacent || myPlayerPosition.equals(pickpocketNPCPosition);
     }
 
     public static boolean menuHoverPickpocketOption() throws InterruptedException {
@@ -117,6 +125,17 @@ public class PickpocketUtil {
                 .filter(option -> option.action.equals("Pickpocket"))
                 .findFirst()
                 .orElse(null) == null;
+    }
+
+    public static int getMaxPossibleCoinPouchStack() {
+        if(methodProvider.diaries.isComplete(Diaries.Diary.ARDOUGNE_ELITE))
+            return 140;
+        else if(methodProvider.diaries.isComplete(Diaries.Diary.ARDOUGNE_HARD))
+            return 84;
+        else if(methodProvider.diaries.isComplete(Diaries.Diary.ARDOUGNE_MEDIUM))
+            return 56;
+        else
+            return 28;
     }
 }
 

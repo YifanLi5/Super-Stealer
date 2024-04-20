@@ -1,5 +1,6 @@
 package Task.Subclasses.Failsafes;
 
+import Paint.ScriptPaint;
 import Task.Task;
 import org.osbot.rs07.Bot;
 import org.osbot.rs07.api.filter.ActionFilter;
@@ -17,6 +18,7 @@ public class EatFoodFailsafeTask extends Task {
 
     @Override
     public void runTask() throws InterruptedException {
+        ScriptPaint.setStatus("Eating");
         if(!inventory.interact("Eat", new ActionFilter<>("Eat"))) {
             log("Error: Unable to interact with eatable item in inventory");
             script.stop(LOGOUT_ON_SCRIPT_STOP);

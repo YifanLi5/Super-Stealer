@@ -46,7 +46,7 @@ public class NPCSelectionPainter extends BotMouseListener implements Painter {
 
         Point clickPt = mouseEvent.getPoint();
         for (NPC npc : queriedNPCs) {
-            Rectangle npcArea = getNPCBoundingBox(npc);
+            Area npcArea = getNPCOutline(npc);
             if (!npcArea.contains(clickPt))
                 continue;
 

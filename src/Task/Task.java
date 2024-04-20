@@ -8,9 +8,8 @@ import org.osbot.rs07.script.Script;
 import java.util.ArrayList;
 
 public abstract class Task extends MethodProvider {
-    protected static boolean LOGOUT_ON_SCRIPT_STOP = false;
-    static NPC knightInstance;
-    protected Script script;
+     protected final static boolean LOGOUT_ON_SCRIPT_STOP = false;
+     protected final Script script;
     private static final ArrayList<Task> subclassInstances = new ArrayList<>();
 
     public Task(Bot bot) {

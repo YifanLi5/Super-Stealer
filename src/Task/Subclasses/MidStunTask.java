@@ -1,5 +1,6 @@
 package Task.Subclasses;
 
+import Paint.ScriptPaint;
 import Task.Task;
 import Util.FoodUtil;
 import Util.PickpocketUtil;
@@ -68,7 +69,10 @@ public class MidStunTask extends Task {
                 impotentPickpocket();
                 break;
             case PREPARE_MENU_HOVER:
-                prepareMenuHover();
+                if(PickpocketUtil.getPickpocketTarget().getName().equalsIgnoreCase("Knight of Ardougne"))
+                    no_op();
+                else
+                    prepareMenuHover();
                 break;
         }
         ConditionalSleep2.sleep(5000, () -> myPlayer().getHeight() < STUNNED_HEIGHT);
@@ -100,33 +104,36 @@ public class MidStunTask extends Task {
         return selectedAction;
     }
 
-    private void eat() {
+    private void eat() throws InterruptedException {
         while(myPlayer().getHeight() >= STUNNED_HEIGHT) {
             int nextFoodSlot = FoodUtil.getInvSlotContainingFoodWithoutOverheal();
             if(nextFoodSlot == -1) {
                 break;
             }
+            ScriptPaint.setStatus("MidStun: Eating");
 
             if(!inventory.interact("Eat", new ActionFilter<>("Eat"))) {
                 log("Error: Unable to interact with eatable item in inventory");
                 script.stop(LOGOUT_ON_SCRIPT_STOP);
                 break;
             }
-            ConditionalSleep2.sleep(2000, () -> inventory.getItemInSlot(nextFoodSlot) == null);
             if(FoodUtil.getInvSlotContainingFoodWithoutOverheal() >= 0) {
                 inventory.hover(nextFoodSlot);
             }
+            ConditionalSleep2.sleep(2000, () -> inventory.getItemInSlot(nextFoodSlot) == null);
+            sleep(random(500, 1500));
         }
     }
 
     private void no_op() {
+        ScriptPaint.setStatus("MidStun: no_op");
         ConditionalSleep2.sleep(5000, () -> myPlayer().getHeight() < STUNNED_HEIGHT);
     }
 
     private void extendedNo_op() throws InterruptedException {
         int sleepTime = RngUtil.gaussian(10000, 1000, 5000, 15000);
+        ScriptPaint.setStatus(String.format("MidStun: Long AFK (%dms)", sleepTime));
         mouse.moveOutsideScreen();
-        log(String.format("Extended no_op, Afk for: %dms", sleepTime));
         sleep(sleepTime);
     }
 
@@ -135,6 +142,7 @@ public class MidStunTask extends Task {
     }
 
     private void prepareMenuHover() throws InterruptedException {
+        ScriptPaint.setStatus("MidStun: hover menu option");
         if(!PickpocketUtil.menuHoverPickpocketOption())
             warn("Pickpocket menu hover failed :(");
 
