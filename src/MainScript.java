@@ -1,0 +1,53 @@
+import Paint.NPCSelectionPainter;
+import Task.*;
+import Task.Subclasses.BankTask;
+import Task.Subclasses.Failsafes.EatFoodFailsafeTask;
+import Task.Subclasses.MidStunTask;
+import Task.Subclasses.PickpocketTask;
+import Util.GlobalMethodProvider;
+import Util.PickpocketUtil;
+import Util.RngUtil;
+import org.osbot.rs07.api.ui.Tab;
+import org.osbot.rs07.script.Script;
+import org.osbot.rs07.script.ScriptManifest;
+
+import static Util.PickpocketUtil.PICKPOCKET;
+
+@ScriptManifest(author = "yfoo", name = "[DEV1] Mark & Pickpocket", info = "Mark target NPC to have this bot to pickpocket them!", version = 0.1, logo = "")
+public class MainScript extends Script {
+
+
+    @Override
+    public void onStart() throws InterruptedException {
+        super.onStart();
+        GlobalMethodProvider.methodProvider = this.bot.getMethods();
+
+        NPCSelectionPainter selectionPainter = new NPCSelectionPainter(this,
+                npc -> npc.isVisible() && npc.hasAction(PICKPOCKET)
+        );
+        PickpocketUtil.userSelections = selectionPainter.awaitSelectedNPCDefinitions();
+
+        new EatFoodFailsafeTask(this.bot);
+        new BankTask(this.bot);
+        new PickpocketTask(this.bot);
+        new MidStunTask(this.bot);
+
+        tabs.open(Tab.INVENTORY);
+        settings.setRunning(true);
+    }
+
+    @Override
+    public int onLoop() throws InterruptedException {
+        Task task = Task.nextTask();
+        if(task != null) {
+            task.runTask();
+        }
+        return RngUtil.gaussian(500, 150, 250, 900);
+    }
+
+    @Override
+    public void onStop() throws InterruptedException {
+        super.onStop();
+        Task.clearSubclassInstances();
+    }
+}
