@@ -1,7 +1,6 @@
 package Task;
 
 import org.osbot.rs07.Bot;
-import org.osbot.rs07.api.model.NPC;
 import org.osbot.rs07.script.MethodProvider;
 import org.osbot.rs07.script.Script;
 

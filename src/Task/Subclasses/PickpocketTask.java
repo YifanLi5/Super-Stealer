@@ -6,8 +6,6 @@ import Util.PickpocketUtil;
 import org.osbot.rs07.Bot;
 import org.osbot.rs07.utility.ConditionalSleep2;
 
-import static Util.PickpocketUtil.isPlayerAdjacentToPickpocketNPC;
-
 public class PickpocketTask extends Task {
 
     private final int maxCoinPouches;

@@ -8,14 +8,11 @@ import Util.RngUtil;
 import Util.Tuple;
 import org.osbot.rs07.Bot;
 import org.osbot.rs07.api.filter.ActionFilter;
-import org.osbot.rs07.api.model.Item;
-import org.osbot.rs07.api.ui.Skill;
 import org.osbot.rs07.utility.ConditionalSleep2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 public class MidStunTask extends Task {
 

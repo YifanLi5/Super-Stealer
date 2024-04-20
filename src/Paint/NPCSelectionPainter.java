@@ -1,6 +1,5 @@
 package Paint;
 
-import Util.PickpocketUtil;
 import org.osbot.rs07.api.def.NPCDefinition;
 import org.osbot.rs07.api.filter.Filter;
 import org.osbot.rs07.api.model.NPC;

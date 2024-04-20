@@ -5,8 +5,6 @@ import Task.Task;
 import Util.BankUtil;
 import org.osbot.rs07.Bot;
 import org.osbot.rs07.api.filter.ActionFilter;
-import org.osbot.rs07.api.filter.Filter;
-import org.osbot.rs07.api.model.Item;
 
 public class BankTask extends Task {
     public BankTask(Bot bot) {

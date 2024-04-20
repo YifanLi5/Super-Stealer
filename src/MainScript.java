@@ -1,16 +1,15 @@
 import Paint.NPCSelectionPainter;
 import Paint.ScriptPaint;
-import Task.*;
 import Task.Subclasses.BankTask;
-import Task.Subclasses.OpenCoinPouches;
 import Task.Subclasses.Failsafes.EatFoodFailsafeTask;
 import Task.Subclasses.MidStunTask;
+import Task.Subclasses.OpenCoinPouches;
 import Task.Subclasses.PickpocketTask;
+import Task.Task;
 import Util.GlobalMethodProvider;
 import Util.PickpocketUtil;
 import Util.RngUtil;
 import org.osbot.rs07.api.ui.Tab;
-import org.osbot.rs07.canvas.paint.Painter;
 import org.osbot.rs07.script.Script;
 import org.osbot.rs07.script.ScriptManifest;
 

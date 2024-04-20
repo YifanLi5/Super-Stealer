@@ -1,6 +1,5 @@
 package Util;
 
-import org.osbot.rs07.api.Favour;
 import org.osbot.rs07.api.Quests;
 import org.osbot.rs07.api.map.Area;
 import org.osbot.rs07.api.map.constants.Banks;
