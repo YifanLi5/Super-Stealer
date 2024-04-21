@@ -12,7 +12,7 @@ import org.osbot.rs07.script.ScriptManifest;
 
 import static Util.PickpocketUtil.PICKPOCKET;
 
-@ScriptManifest(author = "yfoo", name = "[DEV13] Mark & Pickpocket", info = "Mark target NPC to have this bot to pickpocket them!", version = 0.1, logo = "")
+@ScriptManifest(author = "yfoo", name = "[DEV14] Mark & Pickpocket", info = "Mark target NPC to have this bot to pickpocket them!", version = 0.1, logo = "")
 public class MainScript extends Script {
 
     ScriptPaint scriptPaint;
@@ -26,7 +26,7 @@ public class MainScript extends Script {
             stop(false);
         }
 
-        GlobalMethodProvider.methodProvider = this.bot.getMethods();
+        GlobalMethodProvider.globalMethodProvider = this.bot.getMethods();
 
         NPCSelectionPainter selectionPainter = new NPCSelectionPainter(this,
                 npc -> npc.hasAction(PICKPOCKET)

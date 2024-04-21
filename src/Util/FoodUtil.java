@@ -3,7 +3,7 @@ package Util;
 import org.osbot.rs07.api.model.Item;
 import org.osbot.rs07.api.ui.Skill;
 
-import static Util.GlobalMethodProvider.methodProvider;
+import static Util.GlobalMethodProvider.globalMethodProvider;
 
 public enum FoodUtil {
     TROUT("Trout", 7),
@@ -53,10 +53,10 @@ public enum FoodUtil {
     }
 
     public static int getInvSlotContainingFoodWithoutOverheal() {
-        int currentHp = methodProvider.skills.getDynamic(Skill.HITPOINTS);
-        int maxHp = methodProvider.skills.getStatic(Skill.HITPOINTS);
+        int currentHp = globalMethodProvider.skills.getDynamic(Skill.HITPOINTS);
+        int maxHp = globalMethodProvider.skills.getStatic(Skill.HITPOINTS);
         int idx = 0;
-        Item[] items = methodProvider.inventory.getItems();
+        Item[] items = globalMethodProvider.inventory.getItems();
         for(; idx < 28; idx++) {
             int healAmount = getHealAmountForFoodItem(items[idx]);
             if(healAmount > 0 && maxHp - currentHp >= healAmount) {

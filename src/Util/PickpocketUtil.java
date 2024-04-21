@@ -14,7 +14,7 @@ import org.osbot.rs07.utility.ConditionalSleep2;
 import java.awt.*;
 import java.util.List;
 
-import static Util.GlobalMethodProvider.methodProvider;
+import static Util.GlobalMethodProvider.globalMethodProvider;
 
 public class PickpocketUtil {
 
@@ -45,8 +45,8 @@ public class PickpocketUtil {
         int attempts = 0;
         while((pickpocketTarget == null || !pickpocketTarget.exists()) && attempts < 10) {
             attempts++;
-            methodProvider.log(String.format("Npc instance is null. Attempting to locate a new npc instance. %d/10", attempts));
-            pickpocketTarget = methodProvider.npcs.closest(PickpocketUtil.getSelectedNPCIds());
+            globalMethodProvider.log(String.format("Npc instance is null. Attempting to locate a new npc instance. %d/10", attempts));
+            pickpocketTarget = globalMethodProvider.npcs.closest(PickpocketUtil.getSelectedNPCIds());
             MethodProvider.sleep(500);
         }
         return pickpocketTarget != null && pickpocketTarget.exists();
@@ -63,7 +63,7 @@ public class PickpocketUtil {
         InteractionEvent ppEvent = new InteractionEvent(pickpocketTarget, PICKPOCKET);
         ppEvent.setOperateCamera(false);
         while(!ppEvent.hasFinished() && attempts < 10) {
-            methodProvider.execute(ppEvent);
+            globalMethodProvider.execute(ppEvent);
             attempts++;
             interactionSuccessful = ppEvent.hasFinished();
             if(!interactionSuccessful) {
@@ -75,7 +75,7 @@ public class PickpocketUtil {
     }
 
     public static boolean isPlayerAdjacentToPickpocketNPC() throws InterruptedException {
-        Position myPlayerPosition = methodProvider.myPosition();
+        Position myPlayerPosition = globalMethodProvider.myPosition();
         if(pickpocketTarget == null || !pickpocketTarget.exists()) {
             if(!setPickpocketTarget()) {
                 return false;
@@ -90,8 +90,8 @@ public class PickpocketUtil {
     }
 
     public static boolean menuHoverPickpocketOption() throws InterruptedException {
-        if(methodProvider.menu.isOpen()) {
-            return methodProvider.menu.getMenu()
+        if(globalMethodProvider.menu.isOpen()) {
+            return globalMethodProvider.menu.getMenu()
                     .stream()
                     .filter(option -> option.action.equals("Pickpocket"))
                     .findFirst()
@@ -99,55 +99,54 @@ public class PickpocketUtil {
         }
 
         if(!setPickpocketTarget()) {
-            methodProvider.warn("Error: Unable to find a pickpocket NPC to menu hover pickpocket option.");
-            methodProvider.bot.getScriptExecutor().stop(false);
+            globalMethodProvider.warn("Error: Unable to find a pickpocket NPC to menu hover pickpocket option.");
+            globalMethodProvider.bot.getScriptExecutor().stop(false);
             return false;
         }
-        EntityDestination ed = new EntityDestination(methodProvider.bot, pickpocketTarget);
-        if(!methodProvider.mouse.click(ed, true)) {
-            methodProvider.log("Unable to right click on pickpocket NPC to menu hover pickpocket option.");
+        EntityDestination ed = new EntityDestination(globalMethodProvider.bot, pickpocketTarget);
+        if(!globalMethodProvider.mouse.click(ed, true)) {
+            globalMethodProvider.log("Unable to right click on pickpocket NPC to menu hover pickpocket option.");
             return false;
         }
-        boolean menuOpened = ConditionalSleep2.sleep(1000, () -> methodProvider.menu.isOpen());
+        boolean menuOpened = ConditionalSleep2.sleep(1000, () -> globalMethodProvider.menu.isOpen());
         if(!menuOpened) {
-            methodProvider.log("Menu is not open.");
+            globalMethodProvider.log("Menu is not open.");
             return false;
         }
-        List<Option> options = methodProvider.menu.getMenu();
+        List<Option> options = globalMethodProvider.menu.getMenu();
 
         Rectangle optionRec = options.stream()
                 .filter(option -> option.action.equals("Pickpocket"))
                 .findFirst()
-                .map(option -> methodProvider.menu.getOptionRectangle(options.indexOf(option)))
+                .map(option -> globalMethodProvider.menu.getOptionRectangle(options.indexOf(option)))
                 .orElse(null);
         if(optionRec == null) {
-            methodProvider.log("Opened menu does not contain option to pickpocket");
-            Rectangle menuRectangle = methodProvider.menu.getRectangle();
+            globalMethodProvider.log("Opened menu does not contain option to pickpocket");
+            Rectangle menuRectangle = globalMethodProvider.menu.getRectangle();
 
-            Point currentMousePosition = methodProvider.mouse.getPosition();
-            methodProvider.mouse.move(
+            Point currentMousePosition = globalMethodProvider.mouse.getPosition();
+            globalMethodProvider.mouse.move(
                     (int) (currentMousePosition.getX() + MethodProvider.random(-100, 100)),
                     menuRectangle.y + MethodProvider.random(50)
             );
             return false;
         }
-        return methodProvider.mouse.move(new RectangleDestination(methodProvider.bot, optionRec))
-                || methodProvider.menu.getMenu()
+        return globalMethodProvider.mouse.move(new RectangleDestination(globalMethodProvider.bot, optionRec))
+                || globalMethodProvider.menu.getMenu()
                 .stream()
                 .filter(option -> option.action.equals("Pickpocket"))
                 .findFirst()
-                .orElse(null) == null;
+                .orElse(null) != null;
     }
 
     public static int getMaxPossibleCoinPouchStack() {
-        if(methodProvider.diaries.isComplete(Diaries.Diary.ARDOUGNE_ELITE))
+        if(globalMethodProvider.diaries.isComplete(Diaries.Diary.ARDOUGNE_ELITE))
             return 140;
-        else if(methodProvider.diaries.isComplete(Diaries.Diary.ARDOUGNE_HARD))
+        else if(globalMethodProvider.diaries.isComplete(Diaries.Diary.ARDOUGNE_HARD))
             return 84;
-        else if(methodProvider.diaries.isComplete(Diaries.Diary.ARDOUGNE_MEDIUM))
+        else if(globalMethodProvider.diaries.isComplete(Diaries.Diary.ARDOUGNE_MEDIUM))
             return 56;
         else
             return 28;
     }
 }
-

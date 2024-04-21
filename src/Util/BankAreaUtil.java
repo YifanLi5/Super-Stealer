@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 
 // https://osbot.org/forum/topic/167452-bank-utility-for-getting-accessible-banks/
-public class FindBankUtil {
+public class BankAreaUtil {
 
     enum Bank {
         AL_KHARID(Banks.AL_KHARID),
