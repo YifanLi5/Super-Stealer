@@ -29,7 +29,7 @@ public class ScriptPaint extends BotMouseListener implements Painter {
     private static final Color GREEN = new Color(70, 255, 50, 156);
     private final Rectangle togglePaintRectangle;
     private Rectangle gridCanvas;
-    private final Font font = new Font("Arial", Font.PLAIN, 10);
+    private final Font font = new Font("Arial", Font.PLAIN, 12);
     private boolean showPaint = true;
 
     public ScriptPaint(Script script) {
@@ -73,7 +73,7 @@ public class ScriptPaint extends BotMouseListener implements Painter {
 
     private void populatePlaceholderArray() {
         xpTrackTemplate[1][0] = String.format("XP: +%s (%s)", formatNumber(tracker.getGainedXP(Skill.THIEVING)), formatNumber(tracker.getGainedXPPerHour(Skill.THIEVING)));
-        xpTrackTemplate[1][1] = String.format("LVL: %s (+%s)", script.skills.getStatic(Skill.FISHING), tracker.getGainedLevels(Skill.THIEVING));
+        xpTrackTemplate[1][1] = String.format("LVL: %s (+%s)", script.skills.getStatic(Skill.THIEVING), tracker.getGainedLevels(Skill.THIEVING));
         xpTrackTemplate[2][0] = String.format("Status: %s", status);
         xpTrackTemplate[3][0] = formatTime(System.currentTimeMillis() - startTime);
     }

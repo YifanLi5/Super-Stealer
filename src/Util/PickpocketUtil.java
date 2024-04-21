@@ -28,7 +28,12 @@ public class PickpocketUtil {
         PickpocketUtil.userSelections = selections;
     }
 
-    public static NPC getPickpocketTarget() {
+    public static NPC getPickpocketTarget() throws InterruptedException {
+        if(pickpocketTarget == null || !pickpocketTarget.exists()) {
+            if(!setPickpocketTarget()) {
+                return null;
+            }
+        }
         return pickpocketTarget;
     }
 
@@ -117,6 +122,13 @@ public class PickpocketUtil {
                 .orElse(null);
         if(optionRec == null) {
             methodProvider.log("Opened menu does not contain option to pickpocket");
+            Rectangle menuRectangle = methodProvider.menu.getRectangle();
+
+            Point currentMousePosition = methodProvider.mouse.getPosition();
+            methodProvider.mouse.move(
+                    (int) (currentMousePosition.getX() + MethodProvider.random(-100, 100)),
+                    menuRectangle.y + MethodProvider.random(50)
+            );
             return false;
         }
         return methodProvider.mouse.move(new RectangleDestination(methodProvider.bot, optionRec))

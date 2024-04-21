@@ -4,8 +4,8 @@ import Paint.ScriptPaint;
 import Task.Task;
 import org.osbot.rs07.Bot;
 
-public class UnderAttackFailsafeTask extends Task {
-    public UnderAttackFailsafeTask(Bot bot) {
+public class RunAway extends Task {
+    public RunAway(Bot bot) {
         super(bot);
     }
 

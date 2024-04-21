@@ -46,6 +46,10 @@ public class NPCSelectionPainter extends BotMouseListener implements Painter {
         Point clickPt = mouseEvent.getPoint();
         for (NPC npc : queriedNPCs) {
             Area npcArea = getNPCOutline(npc);
+            if(npcArea == null) {
+                script.warn("Unable to get NPC outline. Try stepping off NPC.");
+                continue;
+            }
             if (!npcArea.contains(clickPt))
                 continue;
 
@@ -70,8 +74,13 @@ public class NPCSelectionPainter extends BotMouseListener implements Painter {
         frameCounter += 1;
         if (frameCounter % 100 == 0) {
             queryThievableNPCs();
+            script.log("Found " + queriedNPCs.size());
         }
         for(NPC npc: queriedNPCs) {
+            if(npc == null) {
+                script.log("Found a null");
+                continue;
+            }
             if(npcMatchesSelectedNPCs(npc)) {
                 graphics2D.setColor(Color.GREEN);
             } else {
@@ -106,10 +115,7 @@ public class NPCSelectionPainter extends BotMouseListener implements Painter {
         boolean isSelected = false;
         NPCDefinition definition = npc.getDefinition();
         for(NPCDefinition selectedDefinition: selectedNPCDefinitions) {
-            if(selectedDefinition.getName().equalsIgnoreCase(definition.getName())
-                    && selectedDefinition.getLevel() == definition.getLevel()
-                    && Arrays.equals(selectedDefinition.getActions(), definition.getActions())
-            ) {
+            if(selectedDefinition.getId() == npc.getId()) {
                 isSelected = true;
                 break;
             }

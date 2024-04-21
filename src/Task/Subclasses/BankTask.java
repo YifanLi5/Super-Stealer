@@ -38,9 +38,12 @@ public class BankTask extends Task {
 
         //Todo: Change from lobster to user selection in inventory
         if(bank.open()
-                && bank.depositAll(item -> item.getName().toLowerCase().endsWith("seed"))
+                && bank.depositAll(item -> item.getName().toLowerCase().endsWith("seed")) //For master farmers
                 && bank.withdraw("Lobster", 10) && bank.close())
         {
+            if(!bank.depositAll(item -> item.getName().toLowerCase().endsWith("seed"))) {
+
+            }
             log("Banking Success");
         } else {
             log("Unable restock at bank");

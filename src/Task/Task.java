@@ -18,7 +18,7 @@ public abstract class Task extends MethodProvider {
         log("Initialized task instance of type: " + this.getClass().getCanonicalName());
     }
 
-    public static Task nextTask() {
+    public static Task nextTask() throws InterruptedException {
         Task nextTask = null;
         for (Task task : Task.subclassInstances) {
             if (task.shouldRun()) {
@@ -33,7 +33,7 @@ public abstract class Task extends MethodProvider {
         subclassInstances.clear();
     }
 
-    public abstract boolean shouldRun();
+    public abstract boolean shouldRun() throws InterruptedException;
 
     public abstract void runTask() throws InterruptedException;
 

@@ -1,10 +1,7 @@
 import Paint.NPCSelectionPainter;
 import Paint.ScriptPaint;
-import Task.Subclasses.BankTask;
-import Task.Subclasses.Failsafes.EatFoodFailsafeTask;
-import Task.Subclasses.MidStunTask;
-import Task.Subclasses.OpenCoinPouches;
-import Task.Subclasses.PickpocketTask;
+import Task.Subclasses.*;
+import Task.Subclasses.Failsafes.EmergencyEat;
 import Task.Task;
 import Util.GlobalMethodProvider;
 import Util.PickpocketUtil;
@@ -15,7 +12,7 @@ import org.osbot.rs07.script.ScriptManifest;
 
 import static Util.PickpocketUtil.PICKPOCKET;
 
-@ScriptManifest(author = "yfoo", name = "[DEV9] Mark & Pickpocket", info = "Mark target NPC to have this bot to pickpocket them!", version = 0.1, logo = "")
+@ScriptManifest(author = "yfoo", name = "[DEV12] Mark & Pickpocket", info = "Mark target NPC to have this bot to pickpocket them!", version = 0.1, logo = "")
 public class MainScript extends Script {
 
     ScriptPaint scriptPaint;
@@ -30,12 +27,13 @@ public class MainScript extends Script {
         PickpocketUtil.userSelections = selectionPainter.awaitSelectedNPCDefinitions();
 
 
-        // high -> low priority, if multiple task's shouldRun() return true
-        new EatFoodFailsafeTask(this.bot);
+        // high -> low priority, if multiple task's shouldRun() would return true
+        new EmergencyEat(this.bot);
         new OpenCoinPouches(this.bot);
         new BankTask(this.bot);
         new PickpocketTask(this.bot);
         new MidStunTask(this.bot);
+        new EquipDodgyNecklaceTask(this.bot);
 
         scriptPaint = new ScriptPaint(this);
 
