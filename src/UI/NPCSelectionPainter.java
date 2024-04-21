@@ -1,4 +1,4 @@
-package Paint;
+package UI;
 
 import org.osbot.rs07.api.def.NPCDefinition;
 import org.osbot.rs07.api.filter.Filter;
@@ -12,7 +12,6 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Area;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
@@ -39,13 +38,13 @@ public class NPCSelectionPainter extends BotMouseListener implements Painter {
 
     @Override
     public void checkMouseEvent(MouseEvent mouseEvent) {
-        if (mouseEvent.getID() != MouseEvent.MOUSE_PRESSED) {
+        if (mouseEvent.getID() != MouseEvent.MOUSE_PRESSED && mouseEvent.getButton() == MouseEvent.BUTTON1) {
             return;
         }
 
         Point clickPt = mouseEvent.getPoint();
         for (NPC npc : queriedNPCs) {
-            Area npcArea = getNPCOutline(npc);
+            Rectangle npcArea = getNPCBoundingBox(npc);
             if(npcArea == null) {
                 script.warn("Unable to get NPC outline. Try stepping off NPC.");
                 continue;
@@ -86,7 +85,7 @@ public class NPCSelectionPainter extends BotMouseListener implements Painter {
             } else {
                 graphics2D.setColor(Color.RED);
             }
-            graphics2D.draw(getNPCOutline(npc));
+            graphics2D.draw(getNPCBoundingBox(npc));
         }
 
         finishSelectionRect = drawCenteredStr(graphics2D, "Finish Selection");

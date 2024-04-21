@@ -1,4 +1,4 @@
-package Paint;
+package UI;
 
 import org.osbot.rs07.api.ui.RS2Widget;
 import org.osbot.rs07.api.ui.Skill;
@@ -32,6 +32,8 @@ public class ScriptPaint extends BotMouseListener implements Painter {
     private final Font font = new Font("Arial", Font.PLAIN, 12);
     private boolean showPaint = true;
 
+    boolean showex = true;
+
     public ScriptPaint(Script script) {
         this.script = script;
         int maxNumCols = Arrays.stream(xpTrackTemplate)
@@ -59,7 +61,6 @@ public class ScriptPaint extends BotMouseListener implements Painter {
             blockAccountInfo(g2d);
         }
         drawCenteredStr(g2d, togglePaintRectangle, showPaint ? "--Hide--" : "--Show--");
-
     }
 
     public void onStopCleanup() {
@@ -181,7 +182,7 @@ public class ScriptPaint extends BotMouseListener implements Painter {
 
     @Override
     public void checkMouseEvent(MouseEvent mouseEvent) {
-        if (mouseEvent.getID() == MouseEvent.MOUSE_PRESSED) {
+        if (mouseEvent.getID() == MouseEvent.MOUSE_PRESSED && mouseEvent.getButton() == MouseEvent.BUTTON1) {
             Point clickPt = mouseEvent.getPoint();
             if (togglePaintRectangle.contains(clickPt)) {
                 showPaint = !showPaint;

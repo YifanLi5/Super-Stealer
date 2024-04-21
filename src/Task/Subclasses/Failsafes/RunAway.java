@@ -1,6 +1,6 @@
 package Task.Subclasses.Failsafes;
 
-import Paint.ScriptPaint;
+import UI.ScriptPaint;
 import Task.Task;
 import org.osbot.rs07.Bot;
 

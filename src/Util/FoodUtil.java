@@ -10,6 +10,7 @@ public enum FoodUtil {
     SALMON("Salmon", 9),
     TUNA("Tuna", 10),
     LOBSTER("Lobster", 12),
+    WINE("Jug of wine", 12),
     MONKFISH("Monkfish", 16);
 
     private final String itemName;

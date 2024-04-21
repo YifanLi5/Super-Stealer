@@ -9,6 +9,8 @@ import java.util.ArrayList;
 public abstract class Task extends MethodProvider {
      protected final static boolean LOGOUT_ON_SCRIPT_STOP = false;
      protected final Script script;
+     public static boolean stopScriptNow = false;
+
     private static final ArrayList<Task> subclassInstances = new ArrayList<>();
 
     public Task(Bot bot) {

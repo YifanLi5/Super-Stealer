@@ -1,6 +1,6 @@
 package Task.Subclasses;
 
-import Paint.ScriptPaint;
+import UI.ScriptPaint;
 import Task.Task;
 import Util.PickpocketUtil;
 import org.osbot.rs07.Bot;

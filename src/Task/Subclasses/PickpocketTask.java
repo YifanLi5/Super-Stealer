@@ -1,6 +1,6 @@
 package Task.Subclasses;
 
-import Paint.ScriptPaint;
+import UI.ScriptPaint;
 import Task.Task;
 import Util.PickpocketUtil;
 import org.osbot.rs07.Bot;
@@ -33,6 +33,7 @@ public class PickpocketTask extends Task {
         if(!foundPickpocketTarget) {
             script.warn("Exceeded attempts to find a valid NPC");
             script.stop(LOGOUT_ON_SCRIPT_STOP);
+            return;
         }
 
         boolean interactionSuccessful = PickpocketUtil.pickpocketTarget();

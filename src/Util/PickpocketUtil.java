@@ -43,7 +43,7 @@ public class PickpocketUtil {
 
     public static boolean setPickpocketTarget() throws InterruptedException {
         int attempts = 0;
-        while(pickpocketTarget == null || !pickpocketTarget.exists() && attempts < 10) {
+        while((pickpocketTarget == null || !pickpocketTarget.exists()) && attempts < 10) {
             attempts++;
             methodProvider.log(String.format("Npc instance is null. Attempting to locate a new npc instance. %d/10", attempts));
             pickpocketTarget = methodProvider.npcs.closest(PickpocketUtil.getSelectedNPCIds());

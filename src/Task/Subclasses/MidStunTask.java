@@ -1,57 +1,53 @@
 package Task.Subclasses;
 
-import Paint.ScriptPaint;
+import UI.ScriptPaint;
 import Task.Task;
 import Util.FoodUtil;
 import Util.PickpocketUtil;
 import Util.RngUtil;
-import Util.Tuple;
 import org.osbot.rs07.Bot;
 import org.osbot.rs07.api.filter.ActionFilter;
 import org.osbot.rs07.api.model.NPC;
 import org.osbot.rs07.utility.ConditionalSleep2;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
 
 public class MidStunTask extends Task {
 
+    private final static int stunnedPlayerHeightThreshold = 240;
+
     private enum MidStunActions {
-        EAT, NO_OP, EXTENDED_NO_OP, IMPOTENT_PICKPOCKET, PREPARE_MENU_HOVER
+        EAT(RngUtil.gaussian(1000, 250, 300, 1700)),
+        NO_OP(RngUtil.gaussian(500, 100, 300, 700)),
+        EXTENDED_NO_OP(RngUtil.gaussian(100, 50, 25, 200)),
+        SPAM_PICKPOCKET(RngUtil.gaussian(750, 75, 450, 1050)),
+        PREPARE_MENU_HOVER(RngUtil.gaussian(750, 75, 450, 1050)),
+        DROP_JUNK(RngUtil.gaussian(1000, 250, 300, 1700));
+
+        final int executionWeight;
+        MidStunActions(int executionWeight) {
+            this.executionWeight = executionWeight;
+        }
     }
-    private static final int STUNNED_HEIGHT = 225;
-    private final HashMap<MidStunActions, Integer> midStunActionWeightings;
-    private final ArrayList<Tuple<MidStunActions, Integer>> validActions = new ArrayList<>();
+    private final HashSet<MidStunActions> validActions = new HashSet<>();
 
     public MidStunTask(Bot bot) {
         super(bot);
-        this.midStunActionWeightings = new HashMap<>();
-        this.midStunActionWeightings.put(MidStunActions.EAT, RngUtil.gaussian(1000, 250, 300, 1700));
-        this.midStunActionWeightings.put(MidStunActions.NO_OP, RngUtil.gaussian(500, 100, 300, 700));
-        this.midStunActionWeightings.put(MidStunActions.EXTENDED_NO_OP, RngUtil.gaussian(100, 50, 25, 200));
-        this.midStunActionWeightings.put(MidStunActions.IMPOTENT_PICKPOCKET, RngUtil.gaussian(750, 75, 450, 1050));
-        this.midStunActionWeightings.put(MidStunActions.PREPARE_MENU_HOVER, RngUtil.gaussian(750, 75, 450, 1050));
 
         StringBuilder builder = new StringBuilder("***Mid Stun Action Weighting***\n");
-        for (Map.Entry<MidStunActions, Integer> action: midStunActionWeightings.entrySet()) {
+        for (MidStunActions action: MidStunActions.values()) {
             builder.append(String.format("%s / %d\n",
-                    action.getKey().toString(),
-                    action.getValue()
+                    action.name(),
+                    action.executionWeight
                 )
             );
         }
-
-        validActions.add(new Tuple<>(MidStunActions.EAT, midStunActionWeightings.get(MidStunActions.EAT)));
-        //validActions.add(new Tuple<>(MidStunActions.EXTENDED_NO_OP, midStunActionWeightings.get(MidStunActions.EXTENDED_NO_OP)));
-        validActions.add(new Tuple<>(MidStunActions.IMPOTENT_PICKPOCKET, midStunActionWeightings.get(MidStunActions.IMPOTENT_PICKPOCKET)));
-        validActions.add(new Tuple<>(MidStunActions.PREPARE_MENU_HOVER, midStunActionWeightings.get(MidStunActions.PREPARE_MENU_HOVER)));
         log(builder);
     }
 
     @Override
     public boolean shouldRun() throws InterruptedException {
-        return myPlayer().getAnimation() == 424 && PickpocketUtil.getPickpocketTarget() != null;
+        return myPlayer().getHeight() >= stunnedPlayerHeightThreshold && PickpocketUtil.getPickpocketTarget() != null;
     }
 
     @Override
@@ -65,7 +61,8 @@ public class MidStunTask extends Task {
 
         switch (rollForAction()) {
             case EAT:
-                eat();
+                if(myPlayer().getHealthPercentCache() < 75)
+                    eat();
                 pickpocketTarget.hover();
                 break;
             case NO_OP:
@@ -74,8 +71,8 @@ public class MidStunTask extends Task {
             case EXTENDED_NO_OP:
                 extendedNo_op();
                 break;
-            case IMPOTENT_PICKPOCKET:
-                impotentPickpocket();
+            case SPAM_PICKPOCKET:
+                spamPickpocket();
                 break;
             case PREPARE_MENU_HOVER:
                 if(PickpocketUtil.getPickpocketTarget().getName().equalsIgnoreCase("Knight of Ardougne"))
@@ -84,31 +81,34 @@ public class MidStunTask extends Task {
                     prepareMenuHover();
                 break;
         }
-
-        int sleepTime = RngUtil.gaussian(1000, 250, 0, 2400);
-        ScriptPaint.setStatus(String.format("MidStun - wait for stun (%dms)", sleepTime));
-        sleep(sleepTime);
+        if(myPlayer().getHeight() >= stunnedPlayerHeightThreshold) {
+            int sleepTime = RngUtil.gaussian(1000, 250, 0, 2400);
+            ScriptPaint.setStatus(String.format("MidStun - additional wait (%dms)", sleepTime));
+            sleep(sleepTime);
+        }
     }
 
     private MidStunActions rollForAction() {
-        validActions.add(new Tuple<>(MidStunActions.EAT, midStunActionWeightings.get(MidStunActions.EAT)));
-        validActions.add(new Tuple<>(MidStunActions.EXTENDED_NO_OP, midStunActionWeightings.get(MidStunActions.EXTENDED_NO_OP)));
-        validActions.add(new Tuple<>(MidStunActions.IMPOTENT_PICKPOCKET, midStunActionWeightings.get(MidStunActions.IMPOTENT_PICKPOCKET)));
-        validActions.add(new Tuple<>(MidStunActions.PREPARE_MENU_HOVER, midStunActionWeightings.get(MidStunActions.PREPARE_MENU_HOVER)));
+        validActions.add(MidStunActions.EAT);
+        validActions.add(MidStunActions.EXTENDED_NO_OP);
+        validActions.add(MidStunActions.SPAM_PICKPOCKET);
+        validActions.add(MidStunActions.PREPARE_MENU_HOVER);
 
         MidStunActions selectedAction = null;
         int weightSum = validActions.stream()
-                .mapToInt(Tuple::getSecond)
+                .mapToInt(action -> action.executionWeight)
                 .sum();
         int roll = random(1, weightSum);
-        for (Tuple<MidStunActions, Integer> action: validActions) {
-            roll -= action.getSecond();
+        for (MidStunActions action: validActions) {
+            roll -= action.executionWeight;
             if(roll <= 0) {
-                selectedAction = action.getFirst();
+                selectedAction = action;
                 break;
             }
         }
+        validActions.clear();
         if(selectedAction == null) {
+            script.warn("Error: rolling for an action returned null, this should not happen.");
             script.stop(false);
         }
         return selectedAction;
@@ -117,23 +117,22 @@ public class MidStunTask extends Task {
     private void eat() throws InterruptedException {
         int nextFoodSlot = FoodUtil.getInvSlotContainingFoodWithoutOverheal();
         if(nextFoodSlot == -1) {
-            return;
+            log("Using food item not in FoodUtil, May overheal");
+            nextFoodSlot = inventory.getSlot(new ActionFilter<>("Eat", "Drink"));
         }
         ScriptPaint.setStatus("MidStun - Eating");
 
-        if(!inventory.interact("Eat", new ActionFilter<>("Eat"))) {
-            log("Error: Unable to interact with eatable item in inventory");
+        if(!inventory.interact(nextFoodSlot, "Eat", "Drink")) {
+            warn(String.format("Error: Unable to use item in slot (%d) to heal.", nextFoodSlot));
             script.stop(LOGOUT_ON_SCRIPT_STOP);
             return;
         }
-        if(FoodUtil.getInvSlotContainingFoodWithoutOverheal() >= 0) {
-            inventory.hover(nextFoodSlot);
-        }
-        ConditionalSleep2.sleep(2000, () -> inventory.getItemInSlot(nextFoodSlot) == null);
+        int lambdaTemp = nextFoodSlot;
+        ConditionalSleep2.sleep(2000, () -> inventory.getItemInSlot(lambdaTemp) == null);
 
         NPC pickpocketTarget = PickpocketUtil.getPickpocketTarget();
         if(pickpocketTarget == null) {
-            script.warn("pickpocket target is null even after attempting to re-query");
+            script.warn("Error: pickpocket target is null even after attempting to re-query");
             script.stop(LOGOUT_ON_SCRIPT_STOP);
             return;
         }
@@ -151,14 +150,18 @@ public class MidStunTask extends Task {
         sleep(sleepTime);
     }
 
-    private void impotentPickpocket() throws InterruptedException {
-        PickpocketUtil.pickpocketTarget();
+    private void spamPickpocket() throws InterruptedException {
+        ScriptPaint.setStatus("MidStun - spam pickpocket");
+        while(myPlayer().getHeight() >= stunnedPlayerHeightThreshold) {
+            PickpocketUtil.pickpocketTarget();
+            sleep(RngUtil.gaussian(500, 100, 0, 1000));
+        }
     }
 
     private void prepareMenuHover() throws InterruptedException {
         ScriptPaint.setStatus("MidStun - hover menu option");
         if(!PickpocketUtil.menuHoverPickpocketOption())
-            warn("Pickpocket menu hover failed :(");
+            log("Pickpocket menu hover failed :(");
 
     }
 }

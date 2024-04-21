@@ -1,5 +1,5 @@
-import Paint.NPCSelectionPainter;
-import Paint.ScriptPaint;
+import UI.NPCSelectionPainter;
+import UI.ScriptPaint;
 import Task.Subclasses.*;
 import Task.Subclasses.Failsafes.EmergencyEat;
 import Task.Task;
@@ -12,13 +12,20 @@ import org.osbot.rs07.script.ScriptManifest;
 
 import static Util.PickpocketUtil.PICKPOCKET;
 
-@ScriptManifest(author = "yfoo", name = "[DEV12] Mark & Pickpocket", info = "Mark target NPC to have this bot to pickpocket them!", version = 0.1, logo = "")
+@ScriptManifest(author = "yfoo", name = "[DEV13] Mark & Pickpocket", info = "Mark target NPC to have this bot to pickpocket them!", version = 0.1, logo = "")
 public class MainScript extends Script {
 
     ScriptPaint scriptPaint;
     @Override
     public void onStart() throws InterruptedException {
         super.onStart();
+        if(myPlayer().getHeight() >= 240) {
+            warn("This script uses player height to determine if they are stunned (>=240). " +
+                    "\nAs such your starting height cannot be >= 240. " +
+                    "\nYour height is likely too high due to your weapon or headgear. Please remove them then restart.");
+            stop(false);
+        }
+
         GlobalMethodProvider.methodProvider = this.bot.getMethods();
 
         NPCSelectionPainter selectionPainter = new NPCSelectionPainter(this,
@@ -44,6 +51,11 @@ public class MainScript extends Script {
 
     @Override
     public int onLoop() throws InterruptedException {
+        if(Task.stopScriptNow) {
+            stop(false);
+            return 250;
+        }
+
         Task task = Task.nextTask();
         if(task != null) {
             task.runTask();
