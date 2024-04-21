@@ -95,7 +95,7 @@ public class PickpocketUtil {
                     .stream()
                     .filter(option -> option.action.equals("Pickpocket"))
                     .findFirst()
-                    .orElse(null) == null;
+                    .orElse(null) != null;
         }
 
         if(!setPickpocketTarget()) {
