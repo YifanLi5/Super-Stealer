@@ -59,7 +59,7 @@ public class BankTask extends Task {
                 stopScriptNow("Failed to webwalk to bank.");
                 return;
             }
-        } else if(useWalk) {
+        } else if(useWalk || !map.canReach(bankingEntity)) {
             ScriptPaint.setStatus("walking to bank");
             log("Attempting to walk to bank entity @ " + bankingEntity.getPosition());
             if(!walking.walk(bankingEntity.getArea(5))) {
@@ -74,7 +74,6 @@ public class BankTask extends Task {
             bank.open();
             attempts++;
         }
-
 
         if(bank.isOpen() && bank.depositAll()) {
             HashMap<ItemDefinition, Integer> invDiffToStart = StartingEquipmentUtil.findInvDiff();
