@@ -1,16 +1,15 @@
 package Task.Subclasses;
 
-import UI.ScriptPaint;
 import Task.Task;
 import Util.MidStunUtil;
 import Util.PickpocketUtil;
 import Util.RngUtil;
 import org.osbot.rs07.Bot;
 import org.osbot.rs07.api.model.NPC;
+import org.osbot.rs07.api.ui.Skill;
 import org.osbot.rs07.utility.ConditionalSleep2;
 
 import java.util.HashSet;
-import java.util.concurrent.Callable;
 
 public class MidStunTask extends Task {
 
@@ -33,6 +32,8 @@ public class MidStunTask extends Task {
     }
     private final HashSet<MidStunActions> validActions = new HashSet<>();
 
+    private int eatHpThreshold;
+
     public MidStunTask(Bot bot) {
         super(bot);
 
@@ -50,6 +51,9 @@ public class MidStunTask extends Task {
         validActions.add(MidStunActions.SPAM_PICKPOCKET);
         validActions.add(MidStunActions.PREPARE_MENU_HOVER);
 
+
+        this.eatHpThreshold = RngUtil.gaussian(50, 10, 35, 70);
+        log("eatHpThreshold -> " + this.eatHpThreshold);
     }
 
     @Override
@@ -70,8 +74,11 @@ public class MidStunTask extends Task {
 
         switch (rollForAction()) {
             case EAT:
-                if(myPlayer().getHealthPercentCache() < 75)
+                if(myPlayer().getHealthPercentCache() < this.eatHpThreshold) {
                     MidStunUtil.eat();
+                    this.eatHpThreshold = RngUtil.gaussian(50, 15, 35, 70);
+                    log("eatHpThreshold -> " + this.eatHpThreshold);
+                }
                 pickpocketTarget.hover();
                 break;
             case NO_OP:
@@ -84,8 +91,9 @@ public class MidStunTask extends Task {
                 MidStunUtil.spamPickpocket();
                 break;
             case PREPARE_MENU_HOVER:
+                // Too many players at mass ardy knight splash world result in very large menu.
                 if(PickpocketUtil.getPickpocketTarget().getName().equalsIgnoreCase("Knight of Ardougne"))
-                    MidStunUtil.no_op();
+                    MidStunUtil.spamPickpocket();
                 else
                     MidStunUtil.prepareMenuHover();
                 break;
@@ -98,13 +106,9 @@ public class MidStunTask extends Task {
 
     private MidStunActions rollForAction() {
         if(myPlayer().getHealthPercentCache() < 65) {
-            script.log("< 65% hp, can now eat as mid stun action");
             validActions.add(MidStunActions.EAT);
         }
-        else if(validActions.contains(MidStunActions.EAT)){
-            validActions.remove(MidStunActions.EAT);
-            script.log(">= 65% hp, no more eating as mid stun action");
-        }
+        else validActions.remove(MidStunActions.EAT);
 
         if(inventory.contains(junk))
             validActions.add(MidStunActions.DROP_JUNK);
