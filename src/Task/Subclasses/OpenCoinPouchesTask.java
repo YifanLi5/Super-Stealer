@@ -6,12 +6,12 @@ import Util.PickpocketUtil;
 import org.osbot.rs07.Bot;
 
 
-public class OpenCoinPouches extends Task {
+public class OpenCoinPouchesTask extends Task {
 
-    private static final String COIN_POUCH = "Coin pouch";
+    static final String COIN_POUCH = "Coin pouch";
     private final int maxCoinPouches;
 
-    public OpenCoinPouches(Bot bot) {
+    public OpenCoinPouchesTask(Bot bot) {
         super(bot);
         this.maxCoinPouches = PickpocketUtil.getMaxPossibleCoinPouchStack();
     }

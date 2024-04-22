@@ -98,13 +98,9 @@ public class MidStunTask extends Task {
 
     private MidStunActions rollForAction() {
         if(myPlayer().getHealthPercentCache() < 65) {
-            script.log("< 65% hp, can now eat as mid stun action");
             validActions.add(MidStunActions.EAT);
         }
-        else if(validActions.contains(MidStunActions.EAT)){
-            validActions.remove(MidStunActions.EAT);
-            script.log(">= 65% hp, no more eating as mid stun action");
-        }
+        else validActions.remove(MidStunActions.EAT);
 
         if(inventory.contains(junk))
             validActions.add(MidStunActions.DROP_JUNK);

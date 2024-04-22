@@ -13,6 +13,7 @@ import org.osbot.rs07.utility.ConditionalSleep2;
 
 import java.awt.*;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import static Util.GlobalMethodProvider.globalMethodProvider;
 
@@ -58,6 +59,7 @@ public class PickpocketUtil {
                 return false;
             }
         }
+
         int attempts = 0;
         boolean interactionSuccessful = false;
         InteractionEvent ppEvent = new InteractionEvent(pickpocketTarget, PICKPOCKET);

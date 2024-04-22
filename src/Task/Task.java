@@ -31,6 +31,12 @@ public abstract class Task extends MethodProvider {
         return nextTask;
     }
 
+    public void stopScriptNow(String errorMsg) {
+        warn("Error: " + errorMsg);
+        script.stop(LOGOUT_ON_SCRIPT_STOP);
+        stopScriptNow = true;
+    }
+
     public static void clearSubclassInstances() {
         subclassInstances.clear();
     }
