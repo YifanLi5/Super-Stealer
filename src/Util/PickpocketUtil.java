@@ -2,6 +2,7 @@ package Util;
 
 import org.osbot.rs07.api.Diaries;
 import org.osbot.rs07.api.def.NPCDefinition;
+import org.osbot.rs07.api.filter.Filter;
 import org.osbot.rs07.api.map.Position;
 import org.osbot.rs07.api.model.NPC;
 import org.osbot.rs07.api.ui.Option;
@@ -12,6 +13,7 @@ import org.osbot.rs07.script.MethodProvider;
 import org.osbot.rs07.utility.ConditionalSleep2;
 
 import java.awt.*;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -48,6 +50,7 @@ public class PickpocketUtil {
             attempts++;
             globalMethodProvider.log(String.format("Npc instance is null. Attempting to locate a new npc instance. %d/10", attempts));
             pickpocketTarget = globalMethodProvider.npcs.closest(PickpocketUtil.getSelectedNPCIds());
+
             MethodProvider.sleep(500);
         }
         return pickpocketTarget != null && pickpocketTarget.exists();
@@ -58,6 +61,22 @@ public class PickpocketUtil {
             if(!setPickpocketTarget()) {
                 return false;
             }
+        }
+
+        if(!globalMethodProvider.map.canReach(pickpocketTarget)) {
+            globalMethodProvider.log("Unable to reach the target. Will attempt to use DoorHandler.");
+            if(!globalMethodProvider.doorHandler.handleNextObstacle(pickpocketTarget)) {
+                globalMethodProvider.log("Door handler failed, using backup.");
+                pickpocketTarget = globalMethodProvider.npcs.closest(npc ->
+                        Arrays.stream(PickpocketUtil.getSelectedNPCIds()).anyMatch(n -> n == npc.getId())
+                                && globalMethodProvider.map.canReach(npc)
+                );
+                return pickpocketTarget();
+            }
+            if(!ConditionalSleep2.sleep(10000, () -> globalMethodProvider.map.canReach(pickpocketTarget))) {
+                return false;
+            }
+            globalMethodProvider.log("Door handler succeeded.");
         }
 
         int attempts = 0;

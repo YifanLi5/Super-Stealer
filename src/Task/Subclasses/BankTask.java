@@ -9,6 +9,7 @@ import org.osbot.rs07.api.def.ItemDefinition;
 import org.osbot.rs07.api.filter.ActionFilter;
 import org.osbot.rs07.api.map.Area;
 import org.osbot.rs07.api.model.Entity;
+import org.osbot.rs07.api.ui.Skill;
 import org.osbot.rs07.utility.ConditionalSleep2;
 
 import java.util.HashMap;
@@ -24,12 +25,11 @@ public class BankTask extends Task {
 
     @Override
     public boolean shouldRun() {
-        return (inventory.filter(new ActionFilter<>("Eat", "Drink")).isEmpty())
+        return (inventory.filter(new ActionFilter<>("Eat", "Drink")).isEmpty() && skills.getDynamic(Skill.HITPOINTS) < 30)
                 || inventory.isFull();
     }
 
 
-    //Todo: Split function into static methods in BankUtil
     @Override
     public void runTask() throws InterruptedException {
         ScriptPaint.setStatus("Banking");
@@ -43,7 +43,7 @@ public class BankTask extends Task {
 
         // if bank is far away -> webwalk
         // if bank is close but not too close -> walk
-        // otherwise just use bank.open()
+        // otherwise use canReach and doorHandler then use bank.open()
         Area returnArea = myPlayer().getArea(7);
         Entity bankingEntity = bank.closest();
         int bankDistanceToPlayer = bankingEntity == null ?

@@ -13,7 +13,7 @@ import org.osbot.rs07.script.ScriptManifest;
 
 import static Util.PickpocketUtil.PICKPOCKET;
 
-@ScriptManifest(author = "yfoo", name = "[DEV3] Mark & Steal", info = "Mark target NPC to have this bot to pickpocket them!", version = 0.1, logo = "")
+@ScriptManifest(author = "yfoo", name = "Mark & Steal", info = "Mark target NPC to have this bot to pickpocket them!", version = 0.9, logo = "")
 public class MainScript extends Script {
 
     ScriptPaint scriptPaint;
@@ -24,6 +24,10 @@ public class MainScript extends Script {
             warn("This script uses player height to determine if they are stunned (>=240). " +
                     "\nAs such your starting height cannot be >= 240. " +
                     "\nYour height is likely too high due to your weapon or headgear. Please remove them then restart.");
+            stop(false);
+        } else if (inventory.isFull()) {
+            warn("Do not start this script with a full inventory; inventory.isFull() is used as a banking condition." +
+                    "\nMake some space then restart.");
             stop(false);
         }
 
