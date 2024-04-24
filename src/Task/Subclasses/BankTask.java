@@ -41,8 +41,8 @@ public class BankTask extends Task {
 
         // if bank is far away -> webwalk
         // if bank is close but not too close -> walk
-        // otherwise use canReach and doorHandler then use bank.open()
-        Area returnArea = myPlayer().getArea(7);
+        // otherwise canReach, doorHandler, and bank.open()
+        Area returnArea = myPlayer().getArea(3);
         Entity bankingEntity = bank.closest();
         int bankDistanceToPlayer = bankingEntity == null ?
                 Integer.MAX_VALUE :
@@ -60,7 +60,7 @@ public class BankTask extends Task {
         } else if(useWalk || !map.canReach(bankingEntity)) {
             ScriptPaint.setStatus("walking to bank");
             log("Attempting to walk to bank entity @ " + bankingEntity.getPosition());
-            if(!walking.walk(bankingEntity.getArea(5))) {
+            if(!walking.walk(bankingEntity.getArea(3))) {
                 stopScriptNow("Failed to walk to bank.");
                 return;
             }
@@ -113,6 +113,9 @@ public class BankTask extends Task {
             if(!walking.walk(returnArea)) {
                 stopScriptNow("Failed to walk to back to thieve-able NPCs.");
             }
+        }
+        if(!ConditionalSleep2.sleep(20000, () -> returnArea.contains(myPosition()))) {
+            stopScriptNow("Player is not back at returnArea after banking.");
         }
     }
 }

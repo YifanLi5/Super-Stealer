@@ -13,7 +13,7 @@ import org.osbot.rs07.script.ScriptManifest;
 
 import static Util.PickpocketUtil.PICKPOCKET;
 
-@ScriptManifest(author = "yfoo", name = "Mark & Steal", info = "Mark target NPC to have this bot to pickpocket them!", version = 0.9, logo = "")
+@ScriptManifest(author = "yfoo", name = "[2] Mark & Steal", info = "Mark target NPC to have this bot to pickpocket them!", version = 0.9, logo = "")
 public class MainScript extends Script {
 
     ScriptPaint scriptPaint;
@@ -40,16 +40,17 @@ public class MainScript extends Script {
         );
         PickpocketUtil.userSelections = selectionPainter.awaitSelectedNPCDefinitions();
 
-        // Store starting inventory so bankTask can properly restock
+        // Store starting inventory so bankTask can restock
         StartingEquipmentUtil.setStartingInventory();
 
-        // high -> low priority, if multiple task's shouldRun() would return true
+        // high -> low priority
+        // Call order of subclass's shouldRun()
         new EmergencyEat(this.bot);
         new OpenCoinPouchesTask(this.bot);
-        new BankTask(this.bot);
-        new PickpocketTask(this.bot);
-        new MidStunTask(this.bot);
         new EquipDodgyNecklaceTask(this.bot);
+        new BankTask(this.bot);
+        new MidStunTask(this.bot);
+        new PickpocketTask(this.bot);
 
         // init script paint
         scriptPaint = new ScriptPaint(this);

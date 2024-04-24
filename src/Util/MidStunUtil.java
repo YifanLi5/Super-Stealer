@@ -47,7 +47,7 @@ public class MidStunUtil {
     }
 
     public static void extendedNo_op() throws InterruptedException {
-        int sleepTime = RngUtil.gaussian(10000, 1000, 5000, 15000);
+        int sleepTime = RngUtil.gaussian(6500, 500, 3000, 9000);
         String msg = String.format("MidStun - Long AFK (%dms)", sleepTime);
         globalMethodProvider.log(msg);
         ScriptPaint.setStatus(msg);
