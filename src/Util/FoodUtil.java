@@ -11,6 +11,7 @@ public enum FoodUtil {
     TUNA("Tuna", 10),
     LOBSTER("Lobster", 12),
     WINE("Jug of wine", 12),
+    SWORDFISH("Swordfish", 14),
     MONKFISH("Monkfish", 16);
 
     private final String itemName;
@@ -55,15 +56,18 @@ public enum FoodUtil {
     public static int getInvSlotContainingFoodWithoutOverheal() {
         int currentHp = globalMethodProvider.skills.getDynamic(Skill.HITPOINTS);
         int maxHp = globalMethodProvider.skills.getStatic(Skill.HITPOINTS);
+        boolean found = false;
         int idx = 0;
         Item[] items = globalMethodProvider.inventory.getItems();
         for(; idx < 28; idx++) {
             int healAmount = getHealAmountForFoodItem(items[idx]);
             if(healAmount > 0 && maxHp - currentHp >= healAmount) {
+                found = true;
                 break;
             }
         }
-        return idx >= 28 ? -1 : idx;
+
+        return found ? idx : -1;
     }
 
 }

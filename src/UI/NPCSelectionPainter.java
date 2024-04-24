@@ -11,6 +11,8 @@ import org.osbot.rs07.script.Script;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Area;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -70,25 +72,50 @@ public class NPCSelectionPainter extends BotMouseListener implements Painter {
 
     @Override
     public void onPaint(Graphics2D graphics2D) {
-        frameCounter += 1;
-        if (frameCounter % 100 == 0) {
-            queryThievableNPCs();
-            script.log("Found " + queriedNPCs.size());
-        }
-        for(NPC npc: queriedNPCs) {
-            if(npc == null) {
-                script.log("Found a null");
-                continue;
+        try {
+            frameCounter += 1;
+            if (frameCounter % 100 == 0) {
+                queryThievableNPCs();
+                script.log("Found " + queriedNPCs.size());
             }
-            if(npcMatchesSelectedNPCs(npc)) {
-                graphics2D.setColor(Color.GREEN);
-            } else {
-                graphics2D.setColor(Color.RED);
+            for(NPC npc: queriedNPCs) {
+                if(npc == null) {
+                    script.log("Found a null");
+                    continue;
+                }
+                if(npcMatchesSelectedNPCs(npc)) {
+                    graphics2D.setColor(Color.GREEN);
+                } else {
+                    graphics2D.setColor(Color.RED);
+                }
+
+                Area npcOutline = getNPCOutline(npc);
+                if(npcOutline != null){
+
+                    graphics2D.draw(npcOutline);
+                    continue;
+                }
+                script.warn(String.format("Unable to draw outline for Npc: %s @ %s. " +
+                        "\nUsing Rectangle backup.", npc.getName(), npc.getPosition()));
+                Rectangle npcBB = getNPCBoundingBox(npc);
+                if(npcBB != null) {
+                    graphics2D.draw(npcBB);
+                    continue;
+                }
+                script.warn(String.format("Unable to draw outline for Npc: %s @ %s", npc.getName(), npc.getPosition()));
+
             }
-            graphics2D.draw(getNPCBoundingBox(npc));
+
+            finishSelectionRect = drawCenteredStr(graphics2D, "Finish Selection");
+        } catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            String sStackTrace = sw.toString();
+            script.warn(sStackTrace);
         }
 
-        finishSelectionRect = drawCenteredStr(graphics2D, "Finish Selection");
+
     }
 
     public List<NPCDefinition> awaitSelectedNPCDefinitions() throws InterruptedException {

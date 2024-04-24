@@ -3,7 +3,13 @@ package Task.Subclasses;
 import UI.ScriptPaint;
 import Task.Task;
 import Util.PickpocketUtil;
+import Util.PouchUtil;
 import org.osbot.rs07.Bot;
+import org.osbot.rs07.utility.ConditionalSleep2;
+
+import java.util.concurrent.Callable;
+
+import static Util.GlobalMethodProvider.globalMethodProvider;
 
 
 public class OpenCoinPouchesTask extends Task {
@@ -29,10 +35,8 @@ public class OpenCoinPouchesTask extends Task {
         log("Opening pouches, next open @ " + (maxCoinPouches - nextOpenOffset));
         ScriptPaint.setStatus("Opening pouches");
 
-
-        if(!inventory.interact("Open-all", COIN_POUCH)) {
-            script.warn("Error: Unable to open-all coin pouches");
-            script.stop(LOGOUT_ON_SCRIPT_STOP);
+        if(!PouchUtil.openPouches()) {
+            stopScriptNow("Unable to open-all coin pouche");
         }
     }
 

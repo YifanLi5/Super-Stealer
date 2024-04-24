@@ -3,6 +3,7 @@ package Task.Subclasses;
 import UI.ScriptPaint;
 import Task.Task;
 import Util.BankAreaUtil;
+import Util.PouchUtil;
 import Util.StartingEquipmentUtil;
 import org.osbot.rs07.Bot;
 import org.osbot.rs07.api.def.ItemDefinition;
@@ -33,10 +34,7 @@ public class BankTask extends Task {
     @Override
     public void runTask() throws InterruptedException {
         ScriptPaint.setStatus("Banking");
-
-        if(inventory.contains(COIN_POUCH) && inventory.interact("Open-all", COIN_POUCH))
-            ConditionalSleep2.sleep(1500, () -> !inventory.contains(COIN_POUCH));
-        if(inventory.contains(COIN_POUCH)) {
+        if(!PouchUtil.openPouches()) {
             stopScriptNow("Unable to open-all pouches prior to banking");
             return;
         }

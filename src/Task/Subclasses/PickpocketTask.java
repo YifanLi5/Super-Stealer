@@ -28,7 +28,6 @@ public class PickpocketTask extends Task {
 
     @Override
     public void runTask() throws InterruptedException {
-        long startTime = System.currentTimeMillis();
         ScriptPaint.setStatus("Pickpocketing");
         boolean foundPickpocketTarget = PickpocketUtil.setPickpocketTarget();
         if(!foundPickpocketTarget) {
@@ -47,9 +46,5 @@ public class PickpocketTask extends Task {
 //            PickpocketUtil.menuHoverPickpocketOption();
 //        }
         //ConditionalSleep2.sleep(5000, () -> myPlayer().isAnimating());
-
-        long endTime = System.currentTimeMillis();
-        long duration = endTime - startTime;
-        log("Pickpocket task Time taken: " + duration + " milliseconds");
     }
 }

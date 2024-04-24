@@ -1,6 +1,7 @@
 package Util;
 
 import UI.ScriptPaint;
+import com.sun.org.apache.bcel.internal.generic.RET;
 import org.osbot.rs07.api.filter.ActionFilter;
 import org.osbot.rs07.api.model.NPC;
 import org.osbot.rs07.utility.ConditionalSleep2;
@@ -17,8 +18,12 @@ public class MidStunUtil {
     public static void eat() throws InterruptedException {
         int nextFoodSlot = FoodUtil.getInvSlotContainingFoodWithoutOverheal();
         if(nextFoodSlot == -1) {
-            globalMethodProvider.log("Using food item not in FoodUtil, May overheal");
+            globalMethodProvider.log("Using healing item not in FoodUtil, May overheal");
             nextFoodSlot = globalMethodProvider.inventory.getSlot(new ActionFilter<>("Eat", "Drink"));
+            if(nextFoodSlot == -1) {
+                globalMethodProvider.log("Unable to find an inventory slot containing food. Aborting eat/drink.");
+                return;
+            }
         }
         ScriptPaint.setStatus("MidStun - Eating");
 
@@ -34,9 +39,7 @@ public class MidStunUtil {
         if(pickpocketTarget == null) {
             globalMethodProvider.warn("Error: pickpocket target is null even after attempting to re-query");
             globalMethodProvider.getBot().getScriptExecutor().stop(LOGOUT_ON_SCRIPT_STOP);
-            return;
         }
-        PickpocketUtil.getPickpocketTarget().hover();
     }
 
     public static void no_op() {
@@ -45,7 +48,9 @@ public class MidStunUtil {
 
     public static void extendedNo_op() throws InterruptedException {
         int sleepTime = RngUtil.gaussian(10000, 1000, 5000, 15000);
-        ScriptPaint.setStatus(String.format("MidStun - Long AFK (%dms)", sleepTime));
+        String msg = String.format("MidStun - Long AFK (%dms)", sleepTime);
+        globalMethodProvider.log(msg);
+        ScriptPaint.setStatus(msg);
         globalMethodProvider.mouse.moveOutsideScreen();
         sleep(sleepTime);
     }
@@ -54,7 +59,7 @@ public class MidStunUtil {
         ScriptPaint.setStatus("MidStun - spam pickpocket");
         while(globalMethodProvider.myPlayer().getHeight() >= STUNNED_HEIGHT) {
             PickpocketUtil.pickpocketTarget();
-            sleep(RngUtil.gaussian(500, 100, 0, 1000));
+            sleep(RngUtil.gaussian(325, 50, 0, 450) );
         }
     }
 
