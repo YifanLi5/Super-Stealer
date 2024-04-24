@@ -18,6 +18,6 @@ public class PouchUtil {
             MethodProvider.sleep(600);
             attempts++;
         }
-        return globalMethodProvider.inventory.contains(COIN_POUCH);
+        return !globalMethodProvider.inventory.contains(COIN_POUCH);
     }
 }

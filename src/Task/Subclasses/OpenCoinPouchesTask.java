@@ -36,7 +36,7 @@ public class OpenCoinPouchesTask extends Task {
         ScriptPaint.setStatus("Opening pouches");
 
         if(!PouchUtil.openPouches()) {
-            stopScriptNow("Unable to open-all coin pouche");
+            stopScriptNow("Unable to open-all coin pouches");
         }
     }
 
