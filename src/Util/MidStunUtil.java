@@ -6,7 +6,6 @@ import org.osbot.rs07.api.filter.ActionFilter;
 import org.osbot.rs07.api.model.NPC;
 import org.osbot.rs07.utility.ConditionalSleep2;
 
-import static Task.Subclasses.MidStunTask.STUNNED_HEIGHT;
 import static Task.Task.LOGOUT_ON_SCRIPT_STOP;
 import static Util.GlobalMethodProvider.globalMethodProvider;
 import static org.osbot.rs07.script.MethodProvider.sleep;
@@ -14,6 +13,11 @@ import static org.osbot.rs07.script.MethodProvider.sleep;
 public class MidStunUtil {
 
     private final static String[] junk = {"Jug", "Bowl", "Vial"};
+    public static int approxVerticesCountStunned;
+
+    public static boolean isPlayerStunned() {
+        return approxVerticesCountStunned - globalMethodProvider.myPlayer().getModel().getVerticesCount() <= 5;
+    }
 
     public static void eat() throws InterruptedException {
         int nextFoodSlot = FoodUtil.getInvSlotContainingFoodWithoutOverheal();
@@ -57,7 +61,7 @@ public class MidStunUtil {
 
     public static void spamPickpocket() throws InterruptedException {
         ScriptPaint.setStatus("MidStun - spam pickpocket");
-        while(globalMethodProvider.myPlayer().getHeight() >= STUNNED_HEIGHT) {
+        while(isPlayerStunned()) {
             PickpocketUtil.pickpocketTarget();
             sleep(RngUtil.gaussian(325, 50, 0, 450) );
         }

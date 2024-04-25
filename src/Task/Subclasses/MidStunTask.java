@@ -6,14 +6,13 @@ import Util.PickpocketUtil;
 import Util.RngUtil;
 import org.osbot.rs07.Bot;
 import org.osbot.rs07.api.model.NPC;
-import org.osbot.rs07.api.ui.Skill;
 import org.osbot.rs07.utility.ConditionalSleep2;
 
 import java.util.HashSet;
+import java.util.concurrent.Callable;
 
 public class MidStunTask extends Task {
 
-    public final static int STUNNED_HEIGHT = 240;
     private final static String[] junk = {"Jug", "Bowl", "Vial"};
 
     private enum MidStunActions {
@@ -26,6 +25,7 @@ public class MidStunTask extends Task {
         CAST_SHADOW_VEIL(RngUtil.gaussian(1000, 250, 300, 1700)); // Todo: implement after I get access
 
         final int executionWeight;
+
         MidStunActions(int executionWeight) {
             this.executionWeight = executionWeight;
         }
@@ -36,7 +36,6 @@ public class MidStunTask extends Task {
 
     public MidStunTask(Bot bot) {
         super(bot);
-
         StringBuilder builder = new StringBuilder("***Mid Stun Action Weighting***\n");
         for (MidStunActions action: MidStunActions.values()) {
             builder.append(String.format("%s / %d\n",
@@ -58,7 +57,7 @@ public class MidStunTask extends Task {
 
     @Override
     public boolean shouldRun() throws InterruptedException {
-        return myPlayer().getHeight() >= STUNNED_HEIGHT && PickpocketUtil.getPickpocketTarget() != null;
+        return MidStunUtil.isPlayerStunned() && PickpocketUtil.getPickpocketTarget() != null;
     }
 
     @Override
@@ -101,7 +100,7 @@ public class MidStunTask extends Task {
                 MidStunUtil.dropJunk();
                 break;
         }
-        ConditionalSleep2.sleep(3000, () -> myPlayer().getHeight() < STUNNED_HEIGHT);
+        ConditionalSleep2.sleep(3000, MidStunUtil::isPlayerStunned);
     }
 
     private MidStunActions rollForAction() {

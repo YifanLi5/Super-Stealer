@@ -2,8 +2,10 @@ package Task.Subclasses;
 
 import UI.ScriptPaint;
 import Task.Task;
+import Util.MidStunUtil;
 import Util.PickpocketUtil;
 import org.osbot.rs07.Bot;
+import org.osbot.rs07.api.ui.Skill;
 import org.osbot.rs07.utility.ConditionalSleep2;
 
 public class PickpocketTask extends Task {
@@ -23,7 +25,7 @@ public class PickpocketTask extends Task {
     public boolean shouldRun() {
         return inventory.getEmptySlots() > 0
                 && inventory.getAmount("Coin pouch") < maxCoinPouches
-                && myPlayer().getHeight() <= 200;
+                && !MidStunUtil.isPlayerStunned() && skills.getDynamic(Skill.HITPOINTS) > 5;
     }
 
     @Override

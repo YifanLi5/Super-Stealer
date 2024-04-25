@@ -188,4 +188,9 @@ public class NPCSelectionPainter extends BotMouseListener implements Painter {
     private Area getNPCOutline(NPC npc) {
         return npc.getModel().getArea(npc.getGridX(), npc.getGridY(), npc.getZ());
     }
+
+    public void onStopCleanup() {
+        script.getBot().removePainter(this);
+        script.getBot().removeMouseListener(this);
+    }
 }

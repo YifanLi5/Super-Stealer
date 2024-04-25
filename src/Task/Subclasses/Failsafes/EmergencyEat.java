@@ -5,6 +5,8 @@ import Task.Task;
 import Util.FoodUtil;
 import org.osbot.rs07.Bot;
 import org.osbot.rs07.api.filter.ActionFilter;
+import org.osbot.rs07.api.filter.Filter;
+import org.osbot.rs07.api.model.Item;
 import org.osbot.rs07.api.ui.Skill;
 
 import static Util.GlobalMethodProvider.globalMethodProvider;
@@ -16,7 +18,7 @@ public class EmergencyEat extends Task {
 
     @Override
     public boolean shouldRun() {
-        return skills.getDynamic(Skill.HITPOINTS) < 5 && inventory.contains(FoodUtil.getAllFoodNames());
+        return skills.getDynamic(Skill.HITPOINTS) <= 5 && inventory.contains(new ActionFilter<>("Eat", "Drink"));
     }
 
     @Override

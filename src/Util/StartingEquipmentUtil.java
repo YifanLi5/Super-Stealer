@@ -25,9 +25,9 @@ public class StartingEquipmentUtil {
 
     public static void setStartingInventory() {
         startingInventorySetup = getCurrentInventorySetup();
-        globalMethodProvider.log("Starting inventory setup");
         logInventoryDefinition(startingInventorySetup);
     }
+
 
     public static HashMap<ItemDefinition, Integer> getStartingInventory() throws InterruptedException {
         assertStartingInventorySetupNotNull();
@@ -53,7 +53,7 @@ public class StartingEquipmentUtil {
     }
 
     public static void logInventoryDefinition(HashMap<ItemDefinition, Integer> inventoryDefinition) {
-        StringBuilder logBuilder = new StringBuilder("\n");
+        StringBuilder logBuilder = new StringBuilder("Inventory setup:\n");
         for(Map.Entry<ItemDefinition, Integer> startItemDef: inventoryDefinition.entrySet()) {
             logBuilder.append(String.format("Name: %s | Quantity: %d\n", startItemDef.getKey().getName(), startItemDef.getValue()));
         }

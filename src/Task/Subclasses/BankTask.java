@@ -33,6 +33,11 @@ public class BankTask extends Task {
 
     @Override
     public void runTask() throws InterruptedException {
+        if(StartingEquipmentUtil.getStartingInventory().keySet().isEmpty()) {
+            stopScriptNow("Starting equipment was empty inventory. Stopping now.");
+            return;
+        }
+
         ScriptPaint.setStatus("Banking");
         if(!PouchUtil.openPouches()) {
             stopScriptNow("Unable to open-all pouches prior to banking");
@@ -73,6 +78,11 @@ public class BankTask extends Task {
             attempts++;
         }
 
+        if(attempts >= 5) {
+            stopScriptNow("Unable restock at bank");
+            return;
+        }
+
         if(bank.isOpen() && bank.depositAll()) {
             HashMap<ItemDefinition, Integer> invDiffToStart = StartingEquipmentUtil.findInvDiff();
             log("diff");
@@ -94,10 +104,6 @@ public class BankTask extends Task {
             }
         }
 
-        if(attempts >= 5) {
-            stopScriptNow("Unable restock at bank");
-            return;
-        }
 
         if(bank.isOpen())
             bank.close();
