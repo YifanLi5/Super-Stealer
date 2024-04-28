@@ -5,6 +5,7 @@ import Task.Subclasses.Failsafes.EmergencyEat;
 import Task.Task;
 import Util.*;
 import org.osbot.rs07.api.map.constants.Banks;
+import org.osbot.rs07.api.model.NPC;
 import org.osbot.rs07.api.ui.Tab;
 import org.osbot.rs07.script.Script;
 import org.osbot.rs07.script.ScriptManifest;
@@ -45,9 +46,14 @@ public class MainScript extends Script {
         // Call order of subclass's shouldRun()
         new EmergencyEat(this.bot);
         // If Player starts in Ardy South bank, Stop the script if they exit.
+
+        NPC pickpocketTarget = PickpocketUtil.getPickpocketTarget();
         if(Banks.ARDOUGNE_SOUTH.contains(myPosition())) {
-            log("Assuming player is at mass ardy splash (in Ardy S. Bank). Will stop if they exit.");
-            new StopIfNotInArdySouthTask(this.bot);
+            assert pickpocketTarget != null;
+            if (pickpocketTarget.getName().equals("Knight of Ardougne")) {
+                log("Assuming player is at mass ardy knights (in Ardy S. Bank). Will stop if they exit the bank.");
+                new StopIfNotInArdySouthTask(this.bot);
+            }
         }
         new OpenCoinPouchesTask(this.bot);
         new EquipDodgyNecklaceTask(this.bot);
