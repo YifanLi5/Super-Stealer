@@ -25,11 +25,15 @@ public class PickpocketTask extends Task {
     public boolean shouldRun() {
         return inventory.getEmptySlots() > 0
                 && inventory.getAmount("Coin pouch") < maxCoinPouches
-                && !MidStunUtil.isPlayerStunned() && skills.getDynamic(Skill.HITPOINTS) > 5;
+                && !MidStunUtil.isPlayerStunned()
+                && skills.getDynamic(Skill.HITPOINTS) > 5;
     }
 
     @Override
     public void runTask() throws InterruptedException {
+        if(inventory.isItemSelected())
+            inventory.deselectItem();
+
         ScriptPaint.setStatus("Pickpocketing");
         boolean foundPickpocketTarget = PickpocketUtil.setPickpocketTarget();
         if(!foundPickpocketTarget) {

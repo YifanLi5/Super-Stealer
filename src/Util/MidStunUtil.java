@@ -48,6 +48,7 @@ public class MidStunUtil {
 
     public static void no_op() {
         ScriptPaint.setStatus("MidStun - no_op");
+        ConditionalSleep2.sleep(3000, () -> !MidStunUtil.isPlayerStunned());
     }
 
     public static void extendedNo_op() throws InterruptedException {

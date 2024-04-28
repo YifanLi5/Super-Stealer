@@ -24,7 +24,7 @@ public class EmergencyEat extends Task {
     @Override
     public void runTask() throws InterruptedException {
         ScriptPaint.setStatus("Emergency Eating");
-
+        log("Emergency Eat!");
         int nextFoodSlot = FoodUtil.getInvSlotContainingFoodWithoutOverheal();
         if(nextFoodSlot == -1) {
             log("Using healing item not in FoodUtil, May overheal");

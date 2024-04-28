@@ -4,13 +4,14 @@ import Task.Subclasses.*;
 import Task.Subclasses.Failsafes.EmergencyEat;
 import Task.Task;
 import Util.*;
+import org.osbot.rs07.api.map.constants.Banks;
 import org.osbot.rs07.api.ui.Tab;
 import org.osbot.rs07.script.Script;
 import org.osbot.rs07.script.ScriptManifest;
 
 import static Util.PickpocketUtil.PICKPOCKET;
 
-@ScriptManifest(author = "yfoo", name = "[4] Mark & Steal", info = "Mark target NPC to have this bot to pickpocket them!", version = 0.9, logo = "")
+@ScriptManifest(author = "yfoo", name = "[6] Mark & Steal", info = "Mark target NPC to have this bot to pickpocket them!", version = 0.9, logo = "")
 public class MainScript extends Script {
 
     ScriptPaint scriptPaint;
@@ -43,6 +44,11 @@ public class MainScript extends Script {
         // high -> low priority
         // Call order of subclass's shouldRun()
         new EmergencyEat(this.bot);
+        // If Player starts in Ardy South bank, Stop the script if they exit.
+        if(Banks.ARDOUGNE_SOUTH.contains(myPosition())) {
+            log("Assuming player is at mass ardy splash (in Ardy S. Bank). Will stop if they exit.");
+            new StopIfNotInArdySouthTask(this.bot);
+        }
         new OpenCoinPouchesTask(this.bot);
         new EquipDodgyNecklaceTask(this.bot);
         new BankTask(this.bot);

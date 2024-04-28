@@ -34,7 +34,7 @@ public class MidStunTask extends Task {
 
     private int eatHpThreshold;
 
-    public MidStunTask(Bot bot) {
+    public MidStunTask(Bot bot) throws InterruptedException {
         super(bot);
         StringBuilder builder = new StringBuilder("***Mid Stun Action Weighting***\n");
         for (MidStunActions action: MidStunActions.values()) {
@@ -48,8 +48,12 @@ public class MidStunTask extends Task {
 
         validActions.add(MidStunActions.EXTENDED_NO_OP);
         validActions.add(MidStunActions.SPAM_PICKPOCKET);
-        validActions.add(MidStunActions.PREPARE_MENU_HOVER);
 
+        // Too many players at mass ardy knight splash world result in very large menu.
+        NPC target = PickpocketUtil.getPickpocketTarget();
+
+        if(target != null && !target.getName().equalsIgnoreCase("Knight of Ardougne"))
+            validActions.add(MidStunActions.PREPARE_MENU_HOVER);
 
         this.eatHpThreshold = RngUtil.gaussian(50, 10, 35, 70);
         log("eatHpThreshold -> " + this.eatHpThreshold);
@@ -78,29 +82,26 @@ public class MidStunTask extends Task {
                     this.eatHpThreshold = RngUtil.gaussian(50, 15, 35, 70);
                     log("eatHpThreshold -> " + this.eatHpThreshold);
                 }
-                pickpocketTarget.hover();
                 break;
             case NO_OP:
-                MidStunUtil.no_op();
+                ConditionalSleep2.sleep(3000, () -> !MidStunUtil.isPlayerStunned());
                 break;
             case EXTENDED_NO_OP:
                 MidStunUtil.extendedNo_op();
+                ConditionalSleep2.sleep(3000, () -> !MidStunUtil.isPlayerStunned());
                 break;
             case SPAM_PICKPOCKET:
                 MidStunUtil.spamPickpocket();
+                ConditionalSleep2.sleep(3000, () -> !MidStunUtil.isPlayerStunned());
                 break;
             case PREPARE_MENU_HOVER:
-                // Too many players at mass ardy knight splash world result in very large menu.
-                if(PickpocketUtil.getPickpocketTarget().getName().equalsIgnoreCase("Knight of Ardougne"))
-                    MidStunUtil.spamPickpocket();
-                else
-                    MidStunUtil.prepareMenuHover();
+                MidStunUtil.prepareMenuHover();
+                ConditionalSleep2.sleep(3000, () -> !MidStunUtil.isPlayerStunned());
                 break;
             case DROP_JUNK:
                 MidStunUtil.dropJunk();
                 break;
         }
-        ConditionalSleep2.sleep(3000, MidStunUtil::isPlayerStunned);
     }
 
     private MidStunActions rollForAction() {
