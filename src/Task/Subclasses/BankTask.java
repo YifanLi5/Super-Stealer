@@ -96,7 +96,22 @@ public class BankTask extends Task {
                     stopScriptNow(String.format("Insufficient amount of item %s to continue.", diffItemDef.getKey().getName()));
                     break;
                 }
-                if(!bank.withdraw(itemId, amount)) {
+
+                boolean success = false;
+                attempts = 0;
+                while(attempts < 5 && !success) {
+                    success = bank.withdraw(itemId, amount);
+
+                    attempts++;
+                    if(!success) {
+                        script.log(
+                                String.format("Failed to withdraw item: %s | amount: %d | attempt %d / 5",
+                                        diffItemDef.getKey().getName(), diffItemDef.getValue(), attempts)
+                        );
+                    }
+                    sleep(600);
+                }
+                if(!success) {
                     stopScriptNow(String.format("Unable to withdraw item: %s | amount: %d.", diffItemDef.getKey().getName(), diffItemDef.getValue()));
                     break;
                 }
