@@ -42,11 +42,10 @@ public class MainScript extends Script {
         // Get baseline vertices when idle to determine when stunned.
         MidStunUtil.approxVerticesCountStunned = myPlayer().getModel().getVerticesCount() + 42;
 
-        // high -> low priority
-        // Call order of subclass's shouldRun()
+
+        // high -> low priority of tasks
         new EmergencyEat(this.bot);
         // If Player starts in Ardy South bank, Stop the script if they exit.
-
         NPC pickpocketTarget = PickpocketUtil.getPickpocketTarget();
         if(Banks.ARDOUGNE_SOUTH.contains(myPosition())) {
             assert pickpocketTarget != null;
