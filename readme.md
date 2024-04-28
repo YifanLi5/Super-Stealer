@@ -7,9 +7,9 @@ Osbot thieving script for pickpocketing any valid NPC in the game!
     * auto sets starting inventory as baseline, restocks will restore inventory to baseline
 - Will be active even while stunned. Will randomly pick an action from the following.
 <br> 
-  * Eat
+  * Eat (Will eat at Random HP)
   * Spam pickpocket
-  * Drop Junk
+  * Drop Junk (ex: If using jugs of wine)
   * AFK
 - Dodgy Necklace support
 - Shadow veil (In Progress)
