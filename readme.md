@@ -13,6 +13,7 @@ script for pickpocketing any valid NPC in the game!
   * Drop Junk (ex: If using jugs of wine)
   * AFK
 - Dodgy Necklace support
+- Adjusts Maximum coin pouch stack based on Ardy diaries (Medium: 56, Hard: 84, Elite: 140)
 - Shadow veil (In Progress - requires account progression)
 - CLI support (In Progress)
 
@@ -33,6 +34,7 @@ script for pickpocketing any valid NPC in the game!
 
 ## Todo List:
 - check if splash host is still splashing (If doing mass ardy knight)
+- Set npc atk options to hidden, (so pickpocket is always left click option)
 - Add emergency run away, if player is under attack
 - shadow veil (Once I get access to spell)
 - cli support, (save start location + inventory setup + npc selection)
