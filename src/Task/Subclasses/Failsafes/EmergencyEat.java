@@ -3,11 +3,14 @@ package Task.Subclasses.Failsafes;
 import UI.ScriptPaint;
 import Task.Task;
 import Util.FoodUtil;
+import Util.RetryUtil;
 import org.osbot.rs07.Bot;
 import org.osbot.rs07.api.filter.ActionFilter;
 import org.osbot.rs07.api.filter.Filter;
 import org.osbot.rs07.api.model.Item;
 import org.osbot.rs07.api.ui.Skill;
+
+import java.util.concurrent.Callable;
 
 import static Util.GlobalMethodProvider.globalMethodProvider;
 
@@ -35,8 +38,11 @@ public class EmergencyEat extends Task {
             }
         }
 
-        if(!inventory.interact(nextFoodSlot, "Eat", "Drink")) {
-            stopScriptNow("Error: Unable to interact with eatable/drinkable item in inventory");
+        final int finalNextFoodSlot = nextFoodSlot;
+        final Callable<Boolean> eatItem = () -> inventory.interact(finalNextFoodSlot, "Eat", "Drink");
+
+        if(!RetryUtil.retry(eatItem, 5, 600)) {
+            stopScriptNow("Unable to interact with eatable/drinkable item in inventory");
         }
     }
 }

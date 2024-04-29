@@ -6,10 +6,10 @@ import Util.PickpocketUtil;
 import Util.RngUtil;
 import org.osbot.rs07.Bot;
 import org.osbot.rs07.api.model.NPC;
+import org.osbot.rs07.api.ui.Skill;
 import org.osbot.rs07.utility.ConditionalSleep2;
 
 import java.util.HashSet;
-import java.util.concurrent.Callable;
 
 public class MidStunTask extends Task {
 
@@ -32,7 +32,7 @@ public class MidStunTask extends Task {
     }
     private final HashSet<MidStunActions> validActions = new HashSet<>();
 
-    private int eatHpThreshold;
+    private int eatAtHpPercentage;
 
     public MidStunTask(Bot bot) throws InterruptedException {
         super(bot);
@@ -51,12 +51,11 @@ public class MidStunTask extends Task {
 
         // Too many players at mass ardy knight splash world result in very large menu.
         NPC target = PickpocketUtil.getPickpocketTarget();
-
         if(target != null && !target.getName().equalsIgnoreCase("Knight of Ardougne"))
             validActions.add(MidStunActions.PREPARE_MENU_HOVER);
 
-        this.eatHpThreshold = RngUtil.gaussian(50, 10, 35, 70);
-        log("eatHpThreshold -> " + this.eatHpThreshold);
+        this.eatAtHpPercentage = RngUtil.gaussian(50, 10, 35, 70);
+        log("initial eatAtHpPercentage -> " + this.eatAtHpPercentage);
     }
 
     @Override
@@ -77,10 +76,12 @@ public class MidStunTask extends Task {
 
         switch (rollForAction()) {
             case EAT:
-                if(myPlayer().getHealthPercentCache() < this.eatHpThreshold) {
+                if(playersHealthPercent() < this.eatAtHpPercentage) {
                     MidStunUtil.eat();
-                    this.eatHpThreshold = RngUtil.gaussian(50, 15, 35, 70);
-                    log("eatHpThreshold -> " + this.eatHpThreshold);
+                    if(playersHealthPercent() >= this.eatAtHpPercentage) {
+                        this.eatAtHpPercentage = RngUtil.gaussian(50, 15, 35, 70);
+                        log("next eatAtHpPercentage -> " + this.eatAtHpPercentage);
+                    }
                 }
                 break;
             case NO_OP:
@@ -133,5 +134,10 @@ public class MidStunTask extends Task {
             script.stop(false);
         }
         return selectedAction;
+    }
+
+    private int playersHealthPercent() {
+        double result = ((double) skills.getDynamic(Skill.HITPOINTS) / skills.getStatic(Skill.HITPOINTS)) * 100;
+        return  (int) Math.round(result);
     }
 }

@@ -39,6 +39,7 @@ public class BankTask extends Task {
         }
 
         ScriptPaint.setStatus("Banking");
+
         if(!PouchUtil.openPouches()) {
             stopScriptNow("Unable to open-all pouches prior to banking");
             return;

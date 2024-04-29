@@ -3,8 +3,11 @@ package Util;
 import UI.ScriptPaint;
 import com.sun.org.apache.bcel.internal.generic.RET;
 import org.osbot.rs07.api.filter.ActionFilter;
+import org.osbot.rs07.api.model.Item;
 import org.osbot.rs07.api.model.NPC;
 import org.osbot.rs07.utility.ConditionalSleep2;
+
+import java.util.concurrent.Callable;
 
 import static Task.Task.LOGOUT_ON_SCRIPT_STOP;
 import static Util.GlobalMethodProvider.globalMethodProvider;
@@ -12,7 +15,7 @@ import static org.osbot.rs07.script.MethodProvider.sleep;
 
 public class MidStunUtil {
 
-    private final static String[] junk = {"Jug", "Bowl", "Vial"};
+    private final static String[] junk = {"Jug", "Bowl", "Vial", "Pie dish"};
     public static int approxVerticesCountStunned;
 
     public static boolean isPlayerStunned() {
@@ -31,19 +34,20 @@ public class MidStunUtil {
         }
         ScriptPaint.setStatus("MidStun - Eating");
 
-        if(!globalMethodProvider.inventory.interact(nextFoodSlot, "Eat", "Drink")) {
+        final int itemId_b4Interact = globalMethodProvider.inventory.getItemInSlot(nextFoodSlot).getId();
+        final int finalNextFoodSlot = nextFoodSlot;
+        final Callable<Boolean> eatItem = () -> globalMethodProvider.inventory.interact(finalNextFoodSlot, "Eat", "Drink");
+
+        if(!RetryUtil.retry(eatItem, 5, 600)) {
             globalMethodProvider.warn(String.format("Error: Unable to use item in slot (%d) to heal.", nextFoodSlot));
             globalMethodProvider.getBot().getScriptExecutor().stop(LOGOUT_ON_SCRIPT_STOP);
             return;
         }
-        int lambdaTemp = nextFoodSlot;
-        ConditionalSleep2.sleep(2000, () -> globalMethodProvider.inventory.getItemInSlot(lambdaTemp) == null);
 
-        NPC pickpocketTarget = PickpocketUtil.getPickpocketTarget();
-        if(pickpocketTarget == null) {
-            globalMethodProvider.warn("Error: pickpocket target is null even after attempting to re-query");
-            globalMethodProvider.getBot().getScriptExecutor().stop(LOGOUT_ON_SCRIPT_STOP);
-        }
+        ConditionalSleep2.sleep(2000, () -> {
+            Item item = globalMethodProvider.inventory.getItemInSlot(finalNextFoodSlot);
+            return item == null || item.getId() != itemId_b4Interact;
+        });
     }
 
     public static void no_op() {

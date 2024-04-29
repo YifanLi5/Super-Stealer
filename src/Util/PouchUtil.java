@@ -12,12 +12,7 @@ public class PouchUtil {
     private static final String COIN_POUCH = "Coin pouch";
 
     public static boolean openPouches() throws InterruptedException {
-        int attempts = 0;
-        while(globalMethodProvider.inventory.contains(COIN_POUCH) && attempts < 10) {
-            globalMethodProvider.inventory.interact("Open-all", COIN_POUCH);
-            MethodProvider.sleep(600);
-            attempts++;
-        }
-        return !globalMethodProvider.inventory.contains(COIN_POUCH);
+        boolean result = RetryUtil.retry(() -> globalMethodProvider.inventory.interact("Open-all", COIN_POUCH), 5, 600);
+        return result && !globalMethodProvider.inventory.contains(COIN_POUCH);
     }
 }

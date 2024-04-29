@@ -3,20 +3,21 @@ package Util;
 import org.osbot.rs07.api.def.ItemDefinition;
 import org.osbot.rs07.api.model.Item;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static Util.GlobalMethodProvider.globalMethodProvider;
 
 public class StartingEquipmentUtil {
     private static HashMap<ItemDefinition, Integer> startingInventorySetup = null;
 
+    private static final List<String> itemExclusionList = Arrays.asList(new String[]{"Coin pouch", "Coins", "Jug", "Pie dish"});
+
     public static HashMap<ItemDefinition, Integer> getCurrentInventorySetup() {
         HashMap<ItemDefinition, Integer> invSetup = new HashMap<>();
         Item[] inventory = globalMethodProvider.inventory.getItems();
         for(Item item: inventory) {
             // Coin pouch is not bankable, will cause issues with BankTask if user starts script with them present.
-            if(item == null || item.getName().equals("Coin pouch") || item.getName().equals("Coins"))
+            if(item == null || itemExclusionList.contains(item.getName()))
                 continue;
             invSetup.compute(item.getDefinition(), (k, v) -> v == null ? 1 : v + 1);
         }
