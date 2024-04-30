@@ -2,11 +2,17 @@
 
 Osbot thieving script for pickpocketing any valid NPC in the game!
 
+## Setup:
+- Setup starting inventory manually ingame
+- Start Script, Click NPCs highlighted by painter. (Green = selected)
+- Click Finish Selection
+
+![visual_instructions.jpg](readme_imgs%2Fvisual_instructions.jpg)
+
 ## Features:
 - Restocks from nearest bank when out of supplies
     * remembers starting inventory, restocks will restore inventory to starting state
-- Will be active even while stunned. Will randomly pick an action from the following. 
-<br> 
+- Will be active even while stunned. Will randomly pick an action from the following.
   * Eat (Will eat at Random HP)
   * Spam pickpocket
   * Drop Junk (ex: If using jugs of wine)
@@ -19,8 +25,6 @@ Osbot thieving script for pickpocketing any valid NPC in the game!
 - CLI support (In Progress)
 
 
-![mark_n_thieve1.jpg](readme_imgs%2Fmark_n_thieve1.jpg)
-
 ## Other Notes:
 - Emergency eat is @ <= 5Hp. Generally mid stun eating will offset damage taken. 
 - Script will not start with full inventory. Accommodate for this by leaving enough open slots for coin pouch, coins, other loot
@@ -28,8 +32,6 @@ Osbot thieving script for pickpocketing any valid NPC in the game!
 - If start this script in Ardougne South Bank AND are pickpocketing Ardougne Knights. 
 <br>This script will stop if your character leaves the Ardougne South Bank. 
   * Assumed to be in Ardougne knight mass pickpocket with a splash host.
-
-  
 
 
 ## Proggies
