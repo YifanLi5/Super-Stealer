@@ -4,10 +4,16 @@ Osbot thieving script for pickpocketing any valid NPC in the game!
 
 ## Setup:
 - Setup starting inventory manually ingame
-- Start Script, Click NPCs highlighted by painter. (Green = selected)
+- Start Script, Click NPCs highlighted by painter. <span style="color: green;">(Green = selected)</span>
 - Click Finish Selection
 
 ![visual_instructions.jpg](readme_imgs%2Fvisual_instructions.jpg)
+
+**You must leave empty slots for pickpocket loot. Minimum 2 (coins and coin pouch). 
+<br>
+Adjust accordingly for different NPCs.**
+
+![inv_setup.jpg](readme_imgs%2Finv_setup.jpg)
 
 ## Features:
 - Restocks from nearest bank when out of supplies
