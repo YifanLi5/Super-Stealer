@@ -12,7 +12,7 @@ import org.osbot.rs07.script.ScriptManifest;
 
 import static Util.PickpocketUtil.PICKPOCKET;
 
-@ScriptManifest(author = "yfoo", name = "[dbg0] Mark & Steal", info = "Mark target NPC to have this bot to pickpocket them!", version = 0.9, logo = "")
+@ScriptManifest(author = "yfoo", name = "[dbg1] Mark & Steal", info = "Mark target NPC to have this bot to pickpocket them!", version = 0.9, logo = "")
 public class MainScript extends Script {
 
     ScriptPaint scriptPaint;
@@ -50,7 +50,7 @@ public class MainScript extends Script {
         if(Banks.ARDOUGNE_SOUTH.contains(myPosition())) {
             assert pickpocketTarget != null;
             if (pickpocketTarget.getName().equals("Knight of Ardougne")) {
-                log("Assuming player is at mass ardy knights (in Ardy S. Bank). Will stop if they exit the bank.");
+                log("Player is at mass ardy knights (in Ardy S. Bank). Will stop if they exit the bank.");
                 new StopIfNotInArdySouthTask(this.bot);
             }
         }

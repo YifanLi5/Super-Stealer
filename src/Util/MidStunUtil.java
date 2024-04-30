@@ -79,9 +79,11 @@ public class MidStunUtil {
     }
 
     public static void dropJunk() {
-        if(globalMethodProvider.inventory.contains(junk))
+        if (globalMethodProvider.inventory.contains(junk)) {
+            ScriptPaint.setStatus("MidStun - drop junk");
             globalMethodProvider.inventory.dropAll(junk);
+
+        }
+
     }
-
-
 }

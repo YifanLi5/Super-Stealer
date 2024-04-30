@@ -5,6 +5,7 @@ import Util.MidStunUtil;
 import Util.PickpocketUtil;
 import Util.RngUtil;
 import org.osbot.rs07.Bot;
+import org.osbot.rs07.api.filter.ActionFilter;
 import org.osbot.rs07.api.model.NPC;
 import org.osbot.rs07.api.ui.Skill;
 import org.osbot.rs07.utility.ConditionalSleep2;
@@ -106,7 +107,7 @@ public class MidStunTask extends Task {
     }
 
     private MidStunActions rollForAction() {
-        if(myPlayer().getHealthPercentCache() < 65) {
+        if(myPlayer().getHealthPercentCache() < 65 && inventory.contains(new ActionFilter<>("Eat", "Drink"))) {
             validActions.add(MidStunActions.EAT);
         }
         else validActions.remove(MidStunActions.EAT);

@@ -42,7 +42,7 @@ public class EmergencyEat extends Task {
         final Callable<Boolean> eatItem = () -> inventory.interact(finalNextFoodSlot, "Eat", "Drink");
 
         if(!RetryUtil.retry(eatItem, 5, 600)) {
-            stopScriptNow("Unable to interact with eatable/drinkable item in inventory");
+            stopScriptNow("Player HP <= 5 & Unable to interact with eatable/drinkable item in inventory");
         }
     }
 }

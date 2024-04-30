@@ -14,6 +14,9 @@ public class PouchUtil {
 
     public static boolean openPouches() throws InterruptedException {
         return RetryUtil.retry(() -> {
+            if(!globalMethodProvider.inventory.contains(COIN_POUCH)) {
+                return true;
+            }
             if(globalMethodProvider.inventory.interact(OPEN_ALL, COIN_POUCH))
                 return ConditionalSleep2.sleep(1000, () -> !globalMethodProvider.inventory.contains(COIN_POUCH));
             return false;
