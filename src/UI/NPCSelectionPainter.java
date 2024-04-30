@@ -2,6 +2,7 @@ package UI;
 
 import org.osbot.rs07.api.def.NPCDefinition;
 import org.osbot.rs07.api.filter.Filter;
+import org.osbot.rs07.api.map.Position;
 import org.osbot.rs07.api.model.NPC;
 import org.osbot.rs07.canvas.paint.Painter;
 import org.osbot.rs07.input.mouse.BotMouseListener;
@@ -47,20 +48,22 @@ public class NPCSelectionPainter extends BotMouseListener implements Painter {
         Point clickPt = mouseEvent.getPoint();
         for (NPC npc : queriedNPCs) {
             Rectangle npcArea = getNPCBoundingBox(npc);
-            if(npcArea == null) {
-                script.warn("Unable to get NPC outline. Try stepping off NPC.");
+            // If too many players are thieving one NPC (ex: Ardy knights w/ splash host) then outline will be null.
+            // Allow users to select npcs by clicking on the position.
+            Shape positionOutline = getNPCPositionShape(npc);
+            if(npcArea == null && positionOutline == null) {
+                script.warn("Unable to get either npc position or npc outlines");
                 continue;
             }
-            if (!npcArea.contains(clickPt))
-                continue;
-
-            if (selectedNPCDefinitions.contains(npc.getDefinition())) {
-                script.log(String.format("Removed %s instance", npc.getName()));
-                selectedNPCDefinitions.remove(npc.getDefinition());
-            }
-            else {
-                script.log(String.format("Added %s instance", npc.getName()));
-                selectedNPCDefinitions.add(npc.getDefinition());
+            if (npcArea != null && npcArea.contains(clickPt) || positionOutline != null && positionOutline.contains(clickPt)) {
+                if (selectedNPCDefinitions.contains(npc.getDefinition())) {
+                    script.log(String.format("Removed %s instance", npc.getName()));
+                    selectedNPCDefinitions.remove(npc.getDefinition());
+                }
+                else {
+                    script.log(String.format("Added %s instance", npc.getName()));
+                    selectedNPCDefinitions.add(npc.getDefinition());
+                }
             }
         }
 
@@ -91,19 +94,12 @@ public class NPCSelectionPainter extends BotMouseListener implements Painter {
 
                 Area npcOutline = getNPCOutline(npc);
                 if(npcOutline != null){
-
                     graphics2D.draw(npcOutline);
-                    continue;
                 }
-                script.warn(String.format("Unable to draw outline for Npc: %s @ %s. " +
-                        "\nUsing Rectangle backup.", npc.getName(), npc.getPosition()));
-                Rectangle npcBB = getNPCBoundingBox(npc);
-                if(npcBB != null) {
-                    graphics2D.draw(npcBB);
-                    continue;
+                Shape positionOutline = getNPCPositionShape(npc);
+                if(positionOutline != null) {
+                    graphics2D.draw(positionOutline);
                 }
-                script.warn(String.format("Unable to draw outline for Npc: %s @ %s", npc.getName(), npc.getPosition()));
-
             }
 
             finishSelectionRect = drawCenteredStr(graphics2D, "Finish Selection");
@@ -179,6 +175,14 @@ public class NPCSelectionPainter extends BotMouseListener implements Painter {
         g2d.drawString(str, textX, textY);
 
         return rectangle;
+    }
+
+    private Shape getNPCPositionShape(NPC npc) {
+        Position position = npc.getPosition();
+        if(position != null) {
+            return position.getPolygon(script.getBot());
+        }
+        return null;
     }
 
     private Rectangle getNPCBoundingBox(NPC npc) {
