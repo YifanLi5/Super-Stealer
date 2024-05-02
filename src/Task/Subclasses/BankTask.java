@@ -26,7 +26,7 @@ public class BankTask extends Task {
 
     @Override
     public boolean shouldRun() {
-        return (inventory.filter(new ActionFilter<>("Eat", "Drink")).isEmpty() && skills.getDynamic(Skill.HITPOINTS) < 30)
+        return (inventory.filter(new ActionFilter<>("Eat", "Drink")).isEmpty() && skills.getDynamic(Skill.HITPOINTS) <= 5)
                 || inventory.isFull();
     }
 
@@ -34,7 +34,7 @@ public class BankTask extends Task {
     @Override
     public void runTask() throws InterruptedException {
         if(StartingEquipmentUtil.getStartingInventory().keySet().isEmpty()) {
-            stopScriptNow("Starting equipment was empty inventory. Stopping now.");
+            stopScriptNow("Starting equipment was empty inventory will not restock. Stopping now.");
             return;
         }
 

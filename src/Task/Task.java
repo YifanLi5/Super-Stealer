@@ -7,7 +7,7 @@ import org.osbot.rs07.script.Script;
 import java.util.ArrayList;
 
 public abstract class Task extends MethodProvider {
-     public final static boolean LOGOUT_ON_SCRIPT_STOP = true;
+     public final static boolean LOGOUT_ON_SCRIPT_STOP = false;
      protected final Script script;
      public static boolean stopScriptNow = false;
 

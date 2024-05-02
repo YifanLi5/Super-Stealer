@@ -1,6 +1,7 @@
 package Task.Subclasses;
 
 import Task.Task;
+import Util.GlobalMethodProvider;
 import Util.MidStunUtil;
 import Util.PickpocketUtil;
 import Util.RngUtil;
@@ -11,24 +12,39 @@ import org.osbot.rs07.api.ui.Skill;
 import org.osbot.rs07.utility.ConditionalSleep2;
 
 import java.util.HashSet;
+import java.util.concurrent.Callable;
+
+import static Util.GlobalMethodProvider.globalMethodProvider;
 
 public class MidStunTask extends Task {
 
     private final static String[] junk = {"Jug", "Bowl", "Vial"};
 
     private enum MidStunActions {
-        EAT(RngUtil.gaussian(1000, 250, 300, 1700)),
-        NO_OP(RngUtil.gaussian(500, 100, 300, 700)),
-        EXTENDED_NO_OP(RngUtil.gaussian(50, 25, 0, 150)),
-        SPAM_PICKPOCKET(RngUtil.gaussian(750, 75, 450, 1050)),
-        PREPARE_MENU_HOVER(RngUtil.gaussian(750, 75, 450, 1050)),
-        DROP_JUNK(RngUtil.gaussian(1000, 250, 300, 1700)),
-        CAST_SHADOW_VEIL(RngUtil.gaussian(1000, 250, 300, 1700)); // Todo: implement after I get access
+        EAT(RngUtil.gaussian(1000, 250, 300, 1700), () ->
+                globalMethodProvider.myPlayer().getHealthPercentCache() < 65
+                        && globalMethodProvider.inventory.contains(new ActionFilter<>("Eat", "Drink"))
+                , false
+        ),
+        NO_OP(RngUtil.gaussian(500, 100, 300, 700), () -> true, true),
+        EXTENDED_NO_OP(RngUtil.gaussian(50, 25, 0, 150), () -> true, true),
+        SPAM_PICKPOCKET(RngUtil.gaussian(750, 75, 450, 1050), () -> true, true),
+        PREPARE_MENU_HOVER(RngUtil.gaussian(750, 75, 450, 1050), () -> true, true),
+        DROP_JUNK(RngUtil.gaussian(1000, 250, 300, 1700), () ->
+                globalMethodProvider.inventory.contains(junk)
+        , false),
+        // Todo: implement after I get access
+        CAST_SHADOW_VEIL(RngUtil.gaussian(1000, 250, 300, 1700), () -> true, false);
+
 
         final int executionWeight;
+        final Callable<Boolean> canRun;
+        final boolean isTerminal;
 
-        MidStunActions(int executionWeight) {
+        MidStunActions(int executionWeight, Callable<Boolean> canRun, boolean isTerminal) {
             this.executionWeight = executionWeight;
+            this.canRun = canRun;
+            this.isTerminal = isTerminal;
         }
     }
     private final HashSet<MidStunActions> validActions = new HashSet<>();
@@ -74,8 +90,12 @@ public class MidStunTask extends Task {
             script.stop(LOGOUT_ON_SCRIPT_STOP);
             return;
         }
+        MidStunActions action = rollForAction();
+        if(action == null) {
+            return;
+        }
 
-        switch (rollForAction()) {
+        switch (action) {
             case EAT:
                 if(playersHealthPercent() < this.eatAtHpPercentage) {
                     MidStunUtil.eat();
@@ -86,36 +106,40 @@ public class MidStunTask extends Task {
                 }
                 break;
             case NO_OP:
-                ConditionalSleep2.sleep(3000, () -> !MidStunUtil.isPlayerStunned());
                 break;
             case EXTENDED_NO_OP:
                 MidStunUtil.extendedNo_op();
-                ConditionalSleep2.sleep(3000, () -> !MidStunUtil.isPlayerStunned());
                 break;
             case SPAM_PICKPOCKET:
                 MidStunUtil.spamPickpocket();
-                ConditionalSleep2.sleep(3000, () -> !MidStunUtil.isPlayerStunned());
                 break;
             case PREPARE_MENU_HOVER:
                 MidStunUtil.prepareMenuHover();
-                ConditionalSleep2.sleep(3000, () -> !MidStunUtil.isPlayerStunned());
                 break;
             case DROP_JUNK:
                 MidStunUtil.dropJunk();
                 break;
         }
+
+        if(action.isTerminal) {
+            ConditionalSleep2.sleep(3000, () -> !MidStunUtil.isPlayerStunned());
+        }
     }
 
     private MidStunActions rollForAction() {
-        if(myPlayer().getHealthPercentCache() < 65 && inventory.contains(new ActionFilter<>("Eat", "Drink"))) {
-            validActions.add(MidStunActions.EAT);
+        try {
+            if(MidStunActions.EAT.canRun.call())
+                validActions.add(MidStunActions.EAT);
+            else validActions.remove(MidStunActions.EAT);
+
+            if(MidStunActions.DROP_JUNK.canRun.call())
+                validActions.add(MidStunActions.DROP_JUNK);
+            else validActions.remove(MidStunActions.DROP_JUNK);
+
+        } catch (Exception e) {
+            stopScriptNow("Got exception when attempting to use canRun Callable of MidStunActions enum.");
+            return null;
         }
-        else validActions.remove(MidStunActions.EAT);
-
-        if(inventory.contains(junk))
-            validActions.add(MidStunActions.DROP_JUNK);
-        else validActions.remove(MidStunActions.DROP_JUNK);
-
 
         MidStunActions selectedAction = null;
         int weightSum = validActions.stream()
