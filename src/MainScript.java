@@ -12,7 +12,7 @@ import org.osbot.rs07.script.ScriptManifest;
 
 import static Util.PickpocketUtil.PICKPOCKET;
 
-@ScriptManifest(author = "yfoo", name = "[0] Mark & Steal", info = "Mark target NPC to have this bot to pickpocket them!", version = 1.0, logo = "")
+@ScriptManifest(author = "yfoo", name = "[1] Mark & Steal", info = "Mark target NPC to have this bot to pickpocket them!", version = 1.0, logo = "")
 public class MainScript extends Script {
 
     ScriptPaint scriptPaint;
@@ -56,6 +56,7 @@ public class MainScript extends Script {
         }
         new OpenCoinPouchesTask(this.bot);
         new EquipDodgyNecklaceTask(this.bot);
+        new CastShadowVeilTask(this.bot);
         new BankTask(this.bot);
         new MidStunTask(this.bot);
         new PickpocketTask(this.bot);
