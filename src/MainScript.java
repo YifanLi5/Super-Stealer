@@ -6,22 +6,26 @@ import Task.Task;
 import Util.*;
 import org.osbot.rs07.api.map.constants.Banks;
 import org.osbot.rs07.api.model.NPC;
+import org.osbot.rs07.api.ui.Spells;
 import org.osbot.rs07.api.ui.Tab;
+import org.osbot.rs07.listener.MessageListener;
 import org.osbot.rs07.script.Script;
 import org.osbot.rs07.script.ScriptManifest;
 
 import static Util.PickpocketUtil.PICKPOCKET;
 
-@ScriptManifest(author = "yfoo", name = "[1] Mark & Steal", info = "Mark target NPC to have this bot to pickpocket them!", version = 1.0, logo = "")
+@ScriptManifest(author = "yfoo", name = "[1] Pilfering Pickpocket", info = "Mark target NPC to have this bot to pickpocket them!", version = 1.0, logo = "")
 public class MainScript extends Script {
 
     ScriptPaint scriptPaint;
     NPCSelectionPainter selectionPainter;
+    MessageListener svMessageListener;
+
     @Override
     public void onStart() throws InterruptedException {
         super.onStart();
-        if (inventory.isFull()) {
-            warn("Do not start this script with a full inventory; inventory.isFull() is used as a banking condition." +
+        if (inventory.getEmptySlots() <= 2) {
+            warn("Do not start this script with <= 2 empty slots; you  need room for coin pouch + coins." +
                     "\nMake some space then restart.");
             stop(false);
         }
@@ -42,7 +46,6 @@ public class MainScript extends Script {
         // Get baseline vertices when idle to determine when stunned.
         MidStunUtil.approxVerticesCountStunned = myPlayer().getModel().getVerticesCount() + 42;
 
-
         // high -> low priority of tasks
         new EmergencyEat(this.bot);
         // If Player starts in Ardy South bank, Stop the script if they exit.
@@ -56,7 +59,11 @@ public class MainScript extends Script {
         }
         new OpenCoinPouchesTask(this.bot);
         new EquipDodgyNecklaceTask(this.bot);
-        new CastShadowVeilTask(this.bot);
+        if(ShadowVeilUtil.canCastSV()) {
+            new CastShadowVeilTask(this.bot);
+            svMessageListener = ShadowVeilUtil.initMessageListener(this.bot);
+        }
+
         new BankTask(this.bot);
         new MidStunTask(this.bot);
         new PickpocketTask(this.bot);
@@ -90,8 +97,9 @@ public class MainScript extends Script {
         Task.clearSubclassInstances();
         if(scriptPaint != null)
             scriptPaint.onStopCleanup();
-        if(selectionPainter != null) {
+        if(selectionPainter != null)
             selectionPainter.onStopCleanup();
-        }
+        if(svMessageListener != null)
+            this.bot.removeMessageListener(svMessageListener);
     }
 }
