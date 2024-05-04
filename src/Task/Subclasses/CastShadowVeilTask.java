@@ -5,9 +5,8 @@ import UI.ScriptPaint;
 import Util.RetryUtil;
 import Util.ShadowVeilUtil;
 import org.osbot.rs07.Bot;
-import org.osbot.rs07.api.ui.Message;
 import org.osbot.rs07.api.ui.Spells;
-import org.osbot.rs07.listener.MessageListener;
+import org.osbot.rs07.api.ui.Tab;
 import org.osbot.rs07.utility.ConditionalSleep2;
 
 public class CastShadowVeilTask extends Task {
@@ -18,7 +17,7 @@ public class CastShadowVeilTask extends Task {
 
     @Override
     public boolean shouldRun() throws InterruptedException {
-        return canCast && ShadowVeilUtil.svOffCooldown;
+        return canCast && ShadowVeilUtil.isSvOffCooldown;
     }
 
     @Override
@@ -33,7 +32,8 @@ public class CastShadowVeilTask extends Task {
         }
         ScriptPaint.setStatus("Casting shadow veil");
         if(RetryUtil.retry(() -> magic.castSpell(Spells.ArceuusSpells.SHADOW_VEIL), 5, 600)) {
-            ConditionalSleep2.sleep(2000, () -> !ShadowVeilUtil.svOffCooldown);
+            ConditionalSleep2.sleep(2000, () -> !ShadowVeilUtil.isSvOffCooldown);
+            tabs.open(Tab.INVENTORY);
         }
     }
     // Too late, they're dead.

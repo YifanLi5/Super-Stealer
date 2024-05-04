@@ -4,6 +4,7 @@ import UI.ScriptPaint;
 import Task.Task;
 import Util.BankAreaUtil;
 import Util.PouchUtil;
+import Util.RetryUtil;
 import Util.StartingEquipmentUtil;
 import org.osbot.rs07.Bot;
 import org.osbot.rs07.api.def.ItemDefinition;
@@ -13,13 +14,18 @@ import org.osbot.rs07.api.model.Entity;
 import org.osbot.rs07.api.ui.Skill;
 import org.osbot.rs07.utility.ConditionalSleep2;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.Callable;
-
-import static Task.Subclasses.OpenCoinPouchesTask.COIN_POUCH;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class BankTask extends Task {
+
+    private static class WalkBackParameters {
+        Area returnArea;
+        boolean useWW;
+        boolean useWalk;
+    }
+
+    private final WalkBackParameters walkBackParameters = new WalkBackParameters();
     public BankTask(Bot bot) {
         super(bot);
     }
@@ -39,15 +45,27 @@ public class BankTask extends Task {
         }
 
         ScriptPaint.setStatus("Banking");
-
         if(!PouchUtil.openPouches()) {
             stopScriptNow("Unable to open-all pouches prior to banking");
             return;
         }
 
-        // if bank is far away -> webwalk
-        // if bank is close but not too close -> walk
-        // otherwise canReach, doorHandler, and bank.open()
+        if(!walkToAndOpenNearestBank()) {
+            stopScriptNow("Unable to walk back to nearest bank.");
+            return;
+        }
+
+        boolean bankingSuccess = bank.isOpen() && depositNonStartingItems() && restoreStartingInventory();
+        if(!bankingSuccess) {
+            stopScriptNow("Unable to preform banking operations successfully");
+            return;
+        }
+        if(!returnToPickPocketArea())
+            stopScriptNow("Unable to return back to pickpocket area");
+
+    }
+
+    private boolean walkToAndOpenNearestBank() throws InterruptedException {
         Area returnArea = myPlayer().getArea(3);
         Entity bankingEntity = bank.closest();
         int bankDistanceToPlayer = bankingEntity == null ?
@@ -56,88 +74,95 @@ public class BankTask extends Task {
         boolean useWW = bankDistanceToPlayer > 40;
         boolean useWalk = bankDistanceToPlayer > 20 && bankDistanceToPlayer <= 40;
 
+        walkBackParameters.returnArea = returnArea;
+        walkBackParameters.useWalk = useWalk;
+        walkBackParameters.useWW = useWW;
+
         if(useWW) {
             ScriptPaint.setStatus("Webwalking to bank");
             log("Attempting to webwalk to bank.");
             if(!walking.webWalk(BankAreaUtil.getAccessibleBanks(bot.getMethods()))) {
-                stopScriptNow("Failed to webwalk to bank.");
-                return;
+                warn("Failed to webwalk to bank.");
+                return false;
             }
         } else if(useWalk || !map.canReach(bankingEntity)) {
             ScriptPaint.setStatus("walking to bank");
             log("Attempting to walk to bank entity @ " + bankingEntity.getPosition());
             if(!walking.walk(bankingEntity.getArea(3))) {
-                stopScriptNow("Failed to walk to bank.");
-                return;
+                warn("Failed to walk to bank.");
+                return false;
             }
         }
 
-        // If in pickpocket anim, player will be stuck and bank.open will return false.
-        int attempts = 0;
-        while(attempts < 5 && !bank.isOpen()) {
-            bank.open();
-            attempts++;
-        }
+        return RetryUtil.retry(() -> bank.open(), 5, 1000);
+    }
 
-        if(attempts >= 5) {
-            stopScriptNow("Unable restock at bank");
-            return;
-        }
-
-        if(bank.isOpen() && bank.depositAll()) {
-            HashMap<ItemDefinition, Integer> invDiffToStart = StartingEquipmentUtil.findInvDiff();
-            log("diff");
-            StartingEquipmentUtil.logInventoryDefinition(invDiffToStart);
-            for(Map.Entry<ItemDefinition, Integer> diffItemDef: invDiffToStart.entrySet()) {
-                int itemId = diffItemDef.getKey().getId();
-                int amount = diffItemDef.getValue();
-                if(amount <= 0)
-                    continue;
-                if(bank.getAmount(itemId) < amount) {
-                    stopScriptNow(String.format("Insufficient amount of item %s to continue.", diffItemDef.getKey().getName()));
-                    break;
-                }
-
-                boolean success = false;
-                attempts = 0;
-                while(attempts < 5 && !success) {
-                    success = bank.withdraw(itemId, amount);
-
-                    attempts++;
-                    if(!success) {
-                        script.log(
-                                String.format("Failed to withdraw item: %s | amount: %d | attempt %d / 5",
-                                        diffItemDef.getKey().getName(), diffItemDef.getValue(), attempts)
-                        );
-                    }
-                    sleep(600);
-                }
-                if(!success) {
-                    stopScriptNow(String.format("Unable to withdraw item: %s | amount: %d.", diffItemDef.getKey().getName(), diffItemDef.getValue()));
-                    break;
-                }
-                sleep(600);
-            }
-        }
-
-
+    private boolean returnToPickPocketArea() {
         if(bank.isOpen())
             bank.close();
 
-        if(useWW) {
+        if(this.walkBackParameters.useWW) {
             ScriptPaint.setStatus("Webwalking back to thieve >:)");
-            if(!walking.webWalk(returnArea)) {
-                stopScriptNow("Failed to webwalk to back to thieve-able NPCs.");
+            if(!walking.webWalk(this.walkBackParameters.returnArea)) {
+                warn("Failed to webwalk to back to thieve-able NPCs.");
             }
         }
-        else if(useWalk){
+        else if(this.walkBackParameters.useWalk){
             ScriptPaint.setStatus("Walking back to thieve >:)");
-            if(!walking.walk(returnArea)) {
-                stopScriptNow("Failed to walk to back to thieve-able NPCs.");
+            if(!walking.walk(this.walkBackParameters.returnArea)) {
+                warn("Failed to walk to back to thieve-able NPCs.");
             }
         }
-        if(!ConditionalSleep2.sleep(20000, () -> returnArea.contains(myPosition()))) {
-            stopScriptNow("Player is not back at returnArea after banking.");
+        if(!ConditionalSleep2.sleep(20000, () -> this.walkBackParameters.returnArea.contains(myPosition()))) {
+            warn("Player is not back at returnArea after banking.");
+            return false;
         }
+        return true;
+
+    }
+
+    private boolean depositNonStartingItems() throws InterruptedException {
+        HashMap<ItemDefinition, Integer> startingItems = StartingEquipmentUtil.getStartingInventory();
+        Set<Integer> itemIds = startingItems.keySet().stream().mapToInt(ItemDefinition::getId).boxed().collect(Collectors.toSet());
+        String[] doNotDepositIfCaseInsensitiveSubstring = {"coin", "rune"};
+
+        return RetryUtil.retry(() ->
+                bank.depositAllExcept(
+                        item -> itemIds.contains(item.getId()) || Arrays.stream(doNotDepositIfCaseInsensitiveSubstring).anyMatch(item.getName().toLowerCase()::contains)
+                ), 3, 1000);
+    }
+
+    private boolean restoreStartingInventory() throws InterruptedException {
+        log("Need to withdraw...");
+        HashMap<ItemDefinition, Integer> diff = StartingEquipmentUtil.getDifferenceFromStartingInventory();
+        StartingEquipmentUtil.logInventoryDefinition(diff);
+
+        String errorMsg = null;
+        for(Map.Entry<ItemDefinition, Integer> diffItemDef: diff.entrySet()) {
+            if(diffItemDef.getKey().getName().endsWith("rune"))
+                continue;
+            int itemId = diffItemDef.getKey().getId();
+            int amount = diffItemDef.getValue();
+            if(amount <= 0)
+                continue;
+            if(bank.getAmount(itemId) < amount) {
+                errorMsg = String.format("Insufficient amount of item %s to continue.", diffItemDef.getKey().getName());
+                break;
+            }
+
+            if(!RetryUtil.retry(() -> bank.withdraw(itemId, amount), 5, 1000)) {
+                errorMsg = String.format(
+                        "Failed to withdraw item: %s | amount: %d",
+                        diffItemDef.getKey().getName(), diffItemDef.getValue()
+                );
+                break;
+            }
+            sleep(600);
+        }
+        if(errorMsg != null) {
+            stopScriptNow(errorMsg);
+            return false;
+        }
+        return true;
     }
 }

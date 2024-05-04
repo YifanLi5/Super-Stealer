@@ -12,7 +12,7 @@ import static Util.GlobalMethodProvider.globalMethodProvider;
 
 public class ShadowVeilUtil implements MessageListener {
 
-    public static boolean svOffCooldown = true;
+    public static boolean isSvOffCooldown = true;
     private static final String[] fireRune = {"Fire rune", "Lava rune", "Smoke rune", "Steam rune"};
     private static final String[] earthRune = {"Earth rune", "Lava rune", "Dust rune", "Mud rune"};
 
@@ -34,21 +34,15 @@ public class ShadowVeilUtil implements MessageListener {
         String msg = message.getMessage();
         if(msg.contains("Your Shadow Veil")) {
             globalMethodProvider.log("shadow veil is ready.");
-            svOffCooldown = true;
+            isSvOffCooldown = true;
         } else if (msg.contains("Your thieving abilities")) {
-            svOffCooldown = false;
+            isSvOffCooldown = false;
         }
     }
 
     public static int getNumShadowVeilCasts() throws InterruptedException {
-        if(!globalMethodProvider.magic.open()) {
+        if(!canCastSV())
             return 0;
-        }
-        RS2Widget shadowVeilSpellWidget = globalMethodProvider.widgets.singleFilter(218, rs2Widget -> rs2Widget.getSpellName().contains("Shadow Veil"));
-        if(shadowVeilSpellWidget.getSpriteIndex1() == 1334 || globalMethodProvider.skills.getStatic(Skill.MAGIC) < 47) {
-            globalMethodProvider.log("Shadow veil sprite is blacked out or < 47 magic, unable to cast.");
-            return 0;
-        }
 
         int fireRuneSource = globalMethodProvider.inventory.contains(fireRune) ? (int) globalMethodProvider.inventory.getAmount(fireRune) : Integer.MAX_VALUE;
         int earthRuneSource = globalMethodProvider.inventory.contains(earthRune) ? (int) globalMethodProvider.inventory.getAmount(earthRune) : Integer.MAX_VALUE;
@@ -65,7 +59,7 @@ public class ShadowVeilUtil implements MessageListener {
         }
         RS2Widget shadowVeilSpellWidget = globalMethodProvider.widgets.singleFilter(218, rs2Widget -> rs2Widget.getSpellName().contains("Shadow Veil"));
         if(shadowVeilSpellWidget.getSpriteIndex1() == 1334 || globalMethodProvider.skills.getStatic(Skill.MAGIC) < 47) {
-            globalMethodProvider.log("Shadow veil sprite is blacked out or < 47 magic, unable to cast.");
+            globalMethodProvider.log("Unable to cast Shadow veil, Widget is using blacked out sprite or < 47 magic, ");
             return false;
         }
         return true;

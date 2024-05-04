@@ -14,7 +14,7 @@ import org.osbot.rs07.script.ScriptManifest;
 
 import static Util.PickpocketUtil.PICKPOCKET;
 
-@ScriptManifest(author = "yfoo", name = "[1] Pilfering Pickpocket", info = "Mark target NPC to have this bot to pickpocket them!", version = 1.0, logo = "")
+@ScriptManifest(author = "yfoo", name = "[dbg_bank2] Pilfering Pickpocket", info = "Mark target NPC to have this bot to pickpocket them!", version = 1.0, logo = "")
 public class MainScript extends Script {
 
     ScriptPaint scriptPaint;
@@ -48,7 +48,7 @@ public class MainScript extends Script {
 
         // high -> low priority of tasks
         new EmergencyEat(this.bot);
-        // If Player starts in Ardy South bank, Stop the script if they exit.
+
         NPC pickpocketTarget = PickpocketUtil.getPickpocketTarget();
         if(Banks.ARDOUGNE_SOUTH.contains(myPosition())) {
             assert pickpocketTarget != null;
@@ -63,7 +63,6 @@ public class MainScript extends Script {
             new CastShadowVeilTask(this.bot);
             svMessageListener = ShadowVeilUtil.initMessageListener(this.bot);
         }
-
         new BankTask(this.bot);
         new MidStunTask(this.bot);
         new PickpocketTask(this.bot);
