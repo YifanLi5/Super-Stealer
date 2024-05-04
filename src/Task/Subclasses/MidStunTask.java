@@ -82,8 +82,6 @@ public class MidStunTask extends Task {
 
     @Override
     public void runTask() throws InterruptedException {
-        if(camera.getPitchAngle() != 67)
-            camera.movePitch(67);
         NPC pickpocketTarget = PickpocketUtil.getPickpocketTarget();
         if(pickpocketTarget == null) {
             script.warn("pickpocket target is null even after attempting to re-query");
