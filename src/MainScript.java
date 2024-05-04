@@ -6,7 +6,6 @@ import Task.Task;
 import Util.*;
 import org.osbot.rs07.api.map.constants.Banks;
 import org.osbot.rs07.api.model.NPC;
-import org.osbot.rs07.api.ui.Spells;
 import org.osbot.rs07.api.ui.Tab;
 import org.osbot.rs07.listener.MessageListener;
 import org.osbot.rs07.script.Script;
@@ -14,7 +13,7 @@ import org.osbot.rs07.script.ScriptManifest;
 
 import static Util.PickpocketUtil.PICKPOCKET;
 
-@ScriptManifest(author = "yfoo", name = "[dbg_bank2] Pilfering Pickpocket", info = "Mark target NPC to have this bot to pickpocket them!", version = 1.0, logo = "")
+@ScriptManifest(author = "yfoo", name = "Pilfering Pickpocket", info = "Mark target NPC to have this bot to pickpocket them!", version = 1.0, logo = "")
 public class MainScript extends Script {
 
     ScriptPaint scriptPaint;
@@ -24,10 +23,16 @@ public class MainScript extends Script {
     @Override
     public void onStart() throws InterruptedException {
         super.onStart();
-        if (inventory.getEmptySlots() <= 2) {
-            warn("Do not start this script with <= 2 empty slots; you  need room for coin pouch + coins." +
+        int emptySlotsNeeded = 2;
+        if(inventory.contains("Coins"))
+            emptySlotsNeeded--;
+        if(inventory.contains("Coin pouch"))
+            emptySlotsNeeded--;
+        if (inventory.getEmptySlots() < emptySlotsNeeded) {
+            warn("You need room for coin pouch + coins." +
                     "\nMake some space then restart.");
             stop(false);
+            return;
         }
 
         // Share MethodProvider for UtilClasses
@@ -59,9 +64,8 @@ public class MainScript extends Script {
         }
         new OpenCoinPouchesTask(this.bot);
         new EquipDodgyNecklaceTask(this.bot);
-        if(ShadowVeilUtil.canCastSV()) {
+        if(CastShadowVeilTask.canCastSV()) {
             new CastShadowVeilTask(this.bot);
-            svMessageListener = ShadowVeilUtil.initMessageListener(this.bot);
         }
         new BankTask(this.bot);
         new MidStunTask(this.bot);
@@ -93,7 +97,7 @@ public class MainScript extends Script {
     @Override
     public void onStop() throws InterruptedException {
         super.onStop();
-        Task.clearSubclassInstances();
+        Task.cleanupTasks(bot);
         if(scriptPaint != null)
             scriptPaint.onStopCleanup();
         if(selectionPainter != null)

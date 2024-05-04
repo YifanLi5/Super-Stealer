@@ -1,6 +1,7 @@
 package Task;
 
 import org.osbot.rs07.Bot;
+import org.osbot.rs07.listener.MessageListener;
 import org.osbot.rs07.script.MethodProvider;
 import org.osbot.rs07.script.Script;
 
@@ -37,7 +38,12 @@ public abstract class Task extends MethodProvider {
         stopScriptNow = true;
     }
 
-    public static void clearSubclassInstances() {
+    public static void cleanupTasks(Bot bot) {
+        for(Task task: subclassInstances) {
+            if(task instanceof MessageListener) {
+                bot.removeMessageListener((MessageListener) task);
+            }
+        }
         subclassInstances.clear();
     }
 
