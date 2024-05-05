@@ -24,10 +24,13 @@ Adjust accordingly for different NPCs.**
   * Drop Junk (ex: If using jugs of wine)
   * AFK
 - Dodgy Necklace support
+  * Start with necklaces in inventory
+- - Shadow veil
+  * Start with staff/runes in inventory
 - Adjusts Maximum coin pouch stack based on character's Ardougne diary progression. 
   * (None/Easy/: 28, Medium: 56, Hard: 84, Elite: 140)
 - Should support all Food and jugs of wine. 
-- Shadow veil (In Progress - requires account progression on my end)
+
 - CLI support (In Progress)
 
 
@@ -49,5 +52,4 @@ Adjust accordingly for different NPCs.**
 - check if splash host is still splashing (If doing mass ardy knight)
 - Set npc atk options to hidden, (so pickpocket is always left click option)
 - Add emergency run away, if player is under attack
-- shadow veil (Once I get access to spell)
 - cli support, (save start location + inventory setup + npc selection)
