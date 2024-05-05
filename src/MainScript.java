@@ -4,6 +4,7 @@ import Task.Task;
 import UI.NPCSelectionPainter;
 import UI.ScriptPaint;
 import Util.*;
+import org.osbot.rs07.api.Settings;
 import org.osbot.rs07.api.map.constants.Banks;
 import org.osbot.rs07.api.model.NPC;
 import org.osbot.rs07.api.ui.Tab;
@@ -34,6 +35,11 @@ public class MainScript extends Script {
             stop(false);
             return;
         }
+
+        RetryUtil.retry(
+                () -> settings.setSetting(Settings.AllSettingsTab.CONTROLS, "NPC Attack options", "Hidden"),
+                5, 2500
+        );
 
         // Share MethodProvider for UtilClasses
         GlobalMethodProvider.globalMethodProvider = this.bot.getMethods();
