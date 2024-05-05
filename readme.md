@@ -26,7 +26,7 @@ Adjust accordingly for different NPCs.**
 - Dodgy Necklace support
   * Start with necklaces in inventory
 - Shadow veil
-  * Start with staff/runes in inventory
+  * Start with Shadow Veil castable in magic tab
 - Adjusts Maximum coin pouch stack based on character's Ardougne diary progression. 
   * (None/Easy/: 28, Medium: 56, Hard: 84, Elite: 140)
 - Should support all Food and jugs of wine. 
