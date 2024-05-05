@@ -21,9 +21,9 @@ import java.util.List;
 public class NPCSelectionPainter extends BotMouseListener implements Painter {
     private final Color ALPHA_GREEN = new Color(25, 240, 25, 156);
     private final Filter<NPC> paintableNPCsFilter;
-    private List<NPC> queriedNPCs;
     private final HashSet<NPCDefinition> selectedNPCDefinitions;
     private final Script script;
+    private List<NPC> queriedNPCs;
     private Rectangle finishSelectionRect;
     private int frameCounter = 0;
     private boolean isSelectionComplete;
@@ -51,7 +51,7 @@ public class NPCSelectionPainter extends BotMouseListener implements Painter {
             // If too many players are thieving one NPC (ex: Ardy knights w/ splash host) then outline will be null.
             // Allow users to select npcs by clicking on the position.
             Shape positionOutline = getNPCPositionShape(npc);
-            if(npcArea == null && positionOutline == null) {
+            if (npcArea == null && positionOutline == null) {
                 script.warn("Unable to get either npc position or npc outlines");
                 continue;
             }
@@ -59,8 +59,7 @@ public class NPCSelectionPainter extends BotMouseListener implements Painter {
                 if (selectedNPCDefinitions.contains(npc.getDefinition())) {
                     script.log(String.format("Removed %s instance", npc.getName()));
                     selectedNPCDefinitions.remove(npc.getDefinition());
-                }
-                else {
+                } else {
                     script.log(String.format("Added %s instance", npc.getName()));
                     selectedNPCDefinitions.add(npc.getDefinition());
                 }
@@ -81,23 +80,23 @@ public class NPCSelectionPainter extends BotMouseListener implements Painter {
                 queryThievableNPCs();
                 script.log("Found " + queriedNPCs.size());
             }
-            for(NPC npc: queriedNPCs) {
-                if(npc == null) {
+            for (NPC npc : queriedNPCs) {
+                if (npc == null) {
                     script.log("Found a null");
                     continue;
                 }
-                if(npcMatchesSelectedNPCs(npc)) {
+                if (npcMatchesSelectedNPCs(npc)) {
                     graphics2D.setColor(Color.GREEN);
                 } else {
                     graphics2D.setColor(Color.RED);
                 }
 
                 Area npcOutline = getNPCOutline(npc);
-                if(npcOutline != null){
+                if (npcOutline != null) {
                     graphics2D.draw(npcOutline);
                 }
                 Shape positionOutline = getNPCPositionShape(npc);
-                if(positionOutline != null) {
+                if (positionOutline != null) {
                     graphics2D.draw(positionOutline);
                 }
             }
@@ -115,17 +114,17 @@ public class NPCSelectionPainter extends BotMouseListener implements Painter {
     }
 
     public List<NPCDefinition> awaitSelectedNPCDefinitions() throws InterruptedException {
-        while(!isSelectionComplete) {
+        while (!isSelectionComplete) {
             MethodProvider.sleep(500);
         }
         script.getBot().removeMouseListener(this);
         script.getBot().removePainter(this);
-        if(selectedNPCDefinitions.isEmpty()) {
+        if (selectedNPCDefinitions.isEmpty()) {
             script.warn("Nothing was selected!");
         }
 
         StringBuilder builder = new StringBuilder("Selected NPC Definition(s)\n");
-        for(NPCDefinition definition: selectedNPCDefinitions) {
+        for (NPCDefinition definition : selectedNPCDefinitions) {
             builder.append(String.format("Name: %s / Id: %s / Level: %s\n", definition.getName(), definition.getId(), definition.getLevel()));
         }
         script.log(builder.toString());
@@ -136,8 +135,8 @@ public class NPCSelectionPainter extends BotMouseListener implements Painter {
     private boolean npcMatchesSelectedNPCs(NPC npc) {
         boolean isSelected = false;
         NPCDefinition definition = npc.getDefinition();
-        for(NPCDefinition selectedDefinition: selectedNPCDefinitions) {
-            if(selectedDefinition.getId() == npc.getId()) {
+        for (NPCDefinition selectedDefinition : selectedNPCDefinitions) {
+            if (selectedDefinition.getId() == npc.getId()) {
                 isSelected = true;
                 break;
             }
@@ -148,7 +147,7 @@ public class NPCSelectionPainter extends BotMouseListener implements Painter {
     private void queryThievableNPCs() {
         queriedNPCs = script.npcs.filter(paintableNPCsFilter);
 
-        if(queriedNPCs.isEmpty()) {
+        if (queriedNPCs.isEmpty()) {
             script.log("Found no NPCs with supplied filter");
         }
     }
@@ -179,7 +178,7 @@ public class NPCSelectionPainter extends BotMouseListener implements Painter {
 
     private Shape getNPCPositionShape(NPC npc) {
         Position position = npc.getPosition();
-        if(position != null) {
+        if (position != null) {
             return position.getPolygon(script.getBot());
         }
         return null;

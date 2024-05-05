@@ -1,7 +1,7 @@
 package Task.Subclasses;
 
-import UI.ScriptPaint;
 import Task.Task;
+import UI.ScriptPaint;
 import org.osbot.rs07.Bot;
 import org.osbot.rs07.api.ui.EquipmentSlot;
 

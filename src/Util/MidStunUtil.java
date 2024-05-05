@@ -1,10 +1,8 @@
 package Util;
 
 import UI.ScriptPaint;
-import com.sun.org.apache.bcel.internal.generic.RET;
 import org.osbot.rs07.api.filter.ActionFilter;
 import org.osbot.rs07.api.model.Item;
-import org.osbot.rs07.api.model.NPC;
 import org.osbot.rs07.utility.ConditionalSleep2;
 
 import java.util.concurrent.Callable;
@@ -24,10 +22,10 @@ public class MidStunUtil {
 
     public static void eat() throws InterruptedException {
         int nextFoodSlot = FoodUtil.getInvSlotContainingFoodWithoutOverheal();
-        if(nextFoodSlot == -1) {
+        if (nextFoodSlot == -1) {
             globalMethodProvider.log("Using healing item not in FoodUtil, May overheal");
             nextFoodSlot = globalMethodProvider.inventory.getSlot(new ActionFilter<>("Eat", "Drink"));
-            if(nextFoodSlot == -1) {
+            if (nextFoodSlot == -1) {
                 globalMethodProvider.log("Unable to find an inventory slot containing food. Aborting eat/drink.");
                 return;
             }
@@ -38,7 +36,7 @@ public class MidStunUtil {
         final int finalNextFoodSlot = nextFoodSlot;
         final Callable<Boolean> eatItem = () -> globalMethodProvider.inventory.interact(finalNextFoodSlot, "Eat", "Drink");
 
-        if(!RetryUtil.retry(eatItem, 5, 600)) {
+        if (!RetryUtil.retry(eatItem, 5, 600)) {
             globalMethodProvider.warn(String.format("Error: Unable to use item in slot (%d) to heal.", nextFoodSlot));
             globalMethodProvider.getBot().getScriptExecutor().stop(LOGOUT_ON_SCRIPT_STOP);
             return;
@@ -66,15 +64,15 @@ public class MidStunUtil {
 
     public static void spamPickpocket() throws InterruptedException {
         ScriptPaint.setStatus("MidStun - spam pickpocket");
-        while(isPlayerStunned()) {
+        while (isPlayerStunned()) {
             PickpocketUtil.pickpocketTarget();
-            sleep(RngUtil.gaussian(325, 50, 0, 450) );
+            sleep(RngUtil.gaussian(325, 50, 0, 450));
         }
     }
 
     public static void prepareMenuHover() throws InterruptedException {
         ScriptPaint.setStatus("MidStun - hover menu option");
-        if(!PickpocketUtil.menuHoverPickpocketOption())
+        if (!PickpocketUtil.menuHoverPickpocketOption())
             globalMethodProvider.log("Pickpocket menu hover failed :(");
     }
 

@@ -11,28 +11,11 @@ import java.awt.event.MouseEvent;
 
 public class AreaSelectionPainter extends BotMouseListener implements Painter {
 
-    private enum SelectionState {
-        NONE_SELECTED, A_SELECTED, A_B_SELECTED, ERROR;
-
-        public static SelectionState getSelectionState(Position positionA, Position positionB) {
-            if(positionA == null && positionB == null) {
-                return NONE_SELECTED;
-            } else if (positionA != null && positionB == null) {
-                return A_SELECTED;
-            } else if (positionA != null && positionB != null) {
-                return A_B_SELECTED;
-            } else {
-                return ERROR;
-            }
-        }
-    }
-
+    private final Script script;
     Position positionA;
     Position positionB;
     Position playersLastPosition;
     Area areaAroundPlayer;
-
-    private final Script script;
 
     public AreaSelectionPainter(Script script) {
         this.script = script;
@@ -43,21 +26,21 @@ public class AreaSelectionPainter extends BotMouseListener implements Painter {
 
     @Override
     public void onPaint(Graphics2D graphics2D) {
-        if(playersLastPosition == null) {
+        if (playersLastPosition == null) {
             playersLastPosition = script.myPosition();
         }
-        if(areaAroundPlayer == null || script.myPosition().equals(playersLastPosition)) {
+        if (areaAroundPlayer == null || script.myPosition().equals(playersLastPosition)) {
             script.log("Player has moved. Get new Area around Player");
             areaAroundPlayer = script.myPosition().getArea(15);
         }
 
-        switch(SelectionState.getSelectionState(positionA, positionB)) {
+        switch (SelectionState.getSelectionState(positionA, positionB)) {
             case A_SELECTED:
                 graphics2D.draw(positionA.getPolygon(script.bot));
                 break;
             case A_B_SELECTED:
                 Area mapArea = getOsbArea();
-                if(mapArea != null)
+                if (mapArea != null)
                     graphics2D.draw(mapArea.getPolygon());
             case NONE_SELECTED:
                 break;
@@ -66,21 +49,20 @@ public class AreaSelectionPainter extends BotMouseListener implements Painter {
         }
     }
 
-
     @Override
     public void checkMouseEvent(MouseEvent mouseEvent) {
         if (mouseEvent.getButton() != MouseEvent.BUTTON1 || mouseEvent.getID() != MouseEvent.MOUSE_PRESSED || playersLastPosition == null || areaAroundPlayer == null) {
             return;
         }
-        if(positionA != null && positionB != null) {
+        if (positionA != null && positionB != null) {
             return;
         }
 
         Point clickPt = mouseEvent.getPoint();
-        for(Position positionIter: areaAroundPlayer.getPositions()) {
+        for (Position positionIter : areaAroundPlayer.getPositions()) {
             Polygon positionPoly = positionIter.getPolygon(script.getBot());
-            if(positionPoly.contains(clickPt)) {
-                if(positionA == null) {
+            if (positionPoly.contains(clickPt)) {
+                if (positionA == null) {
                     positionA = positionIter;
                 } else if (positionB == null) {
                     positionB = positionIter;
@@ -91,18 +73,17 @@ public class AreaSelectionPainter extends BotMouseListener implements Painter {
 
     // Find NE and SW, translate to new positions if needed for Area(sw, ne) constructor.
     private Area getOsbArea() {
-        if(positionA.getX() > positionB.getX() && positionA.getY() > positionB.getY()) {
+        if (positionA.getX() > positionB.getX() && positionA.getY() > positionB.getY()) {
             return new Area(positionB, positionA);
-        } else if(positionA.getX() < positionB.getX() && positionA.getY() < positionB.getY()) {
+        } else if (positionA.getX() < positionB.getX() && positionA.getY() < positionB.getY()) {
             return new Area(positionA, positionB);
-        } else if(positionA.getX() < positionB.getX() && positionA.getY() > positionB.getY()) {
+        } else if (positionA.getX() < positionB.getX() && positionA.getY() > positionB.getY()) {
             int transX = positionB.getX() - positionA.getX();
             return new Area(positionB.translate(-transX, 0), positionA.translate(transX, 0));
-        } else if(positionA.getX() > positionB.getX() && positionA.getY() < positionB.getY()) {
+        } else if (positionA.getX() > positionB.getX() && positionA.getY() < positionB.getY()) {
             int transX = positionA.getX() - positionB.getX();
             return new Area(positionA.translate(-transX, 0), positionB.translate(transX, 0));
-        }
-        else {
+        } else {
             script.warn("Bad getOsbArea logic!!!");
             return null;
         }
@@ -111,6 +92,22 @@ public class AreaSelectionPainter extends BotMouseListener implements Painter {
     public void onStopCleanup() {
         script.getBot().removePainter(this);
         script.getBot().removeMouseListener(this);
+    }
+
+    private enum SelectionState {
+        NONE_SELECTED, A_SELECTED, A_B_SELECTED, ERROR;
+
+        public static SelectionState getSelectionState(Position positionA, Position positionB) {
+            if (positionA == null && positionB == null) {
+                return NONE_SELECTED;
+            } else if (positionA != null && positionB == null) {
+                return A_SELECTED;
+            } else if (positionA != null && positionB != null) {
+                return A_B_SELECTED;
+            } else {
+                return ERROR;
+            }
+        }
     }
 
 
