@@ -13,12 +13,17 @@ import static Util.GlobalMethodProvider.globalMethodProvider;
 
 public class CastShadowVeilTask extends Task implements MessageListener {
     boolean canCast = true;
-    boolean isSvActive = false;
+    boolean isSvActive;
     long nextSVTimestamp = 0;
 
-    public CastShadowVeilTask(Bot bot) throws InterruptedException {
+    public CastShadowVeilTask(Bot bot) {
         super(bot);
         bot.addMessageListener(this);
+
+        if(magic.open()) {
+            RS2Widget svWidget = widgets.singleFilter(218, rs2Widget -> rs2Widget.getSpellName().contains("Shadow Veil"));
+            isSvActive = svWidget != null && svWidget.getAlpha() < 150;
+        }
     }
 
     @Override
@@ -65,7 +70,7 @@ public class CastShadowVeilTask extends Task implements MessageListener {
         }
         RS2Widget shadowVeilSpellWidget = globalMethodProvider.widgets.singleFilter(218, rs2Widget -> rs2Widget.getSpellName().contains("Shadow Veil"));
         if(shadowVeilSpellWidget.getSpriteIndex1() == 1334 || globalMethodProvider.skills.getStatic(Skill.MAGIC) < 47) {
-            globalMethodProvider.log("Unable to cast Shadow veil, Widget is using blacked out sprite or < 47 magic, ");
+            globalMethodProvider.log("Unable to cast Shadow veil, Widget is using blacked out || is on cooldown || < 47 magic, ");
             return false;
         }
         return true;
