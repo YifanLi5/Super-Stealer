@@ -1,7 +1,7 @@
 package Task.Subclasses.Failsafes;
 
-import UI.ScriptPaint;
 import Task.Task;
+import UI.ScriptPaint;
 import org.osbot.rs07.Bot;
 
 public class RunAway extends Task {

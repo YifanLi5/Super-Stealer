@@ -12,6 +12,10 @@ import java.awt.event.MouseEvent;
 import java.util.Arrays;
 
 public class ScriptPaint extends BotMouseListener implements Painter {
+    private static final Color GRID_BG = new Color(70, 61, 50, 156);
+    private static final Color RED = new Color(255, 61, 50, 156);
+    private static final Color GREEN = new Color(70, 255, 50, 156);
+    private static String status = "null";
     private final Script script;
     private final long startTime;
     private final ExperienceTracker tracker;
@@ -21,18 +25,13 @@ public class ScriptPaint extends BotMouseListener implements Painter {
             {"[2][0] (Status)"},
             {"[3][0] (Runtime)"}
     };
-    private static String status = "null";
     private final int cellWidth = 125;
     private final int cellHeight = 35;
-    private static final Color GRID_BG = new Color(70, 61, 50, 156);
-    private static final Color RED = new Color(255, 61, 50, 156);
-    private static final Color GREEN = new Color(70, 255, 50, 156);
     private final Rectangle togglePaintRectangle;
-    private Rectangle gridCanvas;
     private final Font font = new Font("Arial", Font.PLAIN, 12);
-    private boolean showPaint = true;
-
     boolean showex = true;
+    private Rectangle gridCanvas;
+    private boolean showPaint = true;
 
     public ScriptPaint(Script script) {
         this.script = script;
@@ -51,6 +50,10 @@ public class ScriptPaint extends BotMouseListener implements Painter {
         tracker.start(Skill.THIEVING);
     }
 
+    public static void setStatus(String status) {
+        ScriptPaint.status = status;
+    }
+
     @Override
     public void onPaint(Graphics2D g2d) {
         g2d.setFont(font);
@@ -66,10 +69,6 @@ public class ScriptPaint extends BotMouseListener implements Painter {
     public void onStopCleanup() {
         script.getBot().removePainter(this);
         script.getBot().removeMouseListener(this);
-    }
-
-    public static void setStatus(String status) {
-        ScriptPaint.status = status;
     }
 
     private void populatePlaceholderArray() {

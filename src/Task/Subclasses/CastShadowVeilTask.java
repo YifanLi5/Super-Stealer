@@ -7,7 +7,6 @@ import Util.RngUtil;
 import org.osbot.rs07.Bot;
 import org.osbot.rs07.api.ui.*;
 import org.osbot.rs07.listener.MessageListener;
-import org.osbot.rs07.utility.ConditionalSleep2;
 
 import static Util.GlobalMethodProvider.globalMethodProvider;
 
@@ -20,10 +19,23 @@ public class CastShadowVeilTask extends Task implements MessageListener {
         super(bot);
         bot.addMessageListener(this);
 
-        if(magic.open()) {
+        if (magic.open()) {
             RS2Widget svWidget = widgets.singleFilter(218, rs2Widget -> rs2Widget.getSpellName().contains("Shadow Veil"));
             isSvActive = svWidget != null && svWidget.getAlpha() < 150;
         }
+    }
+
+    public static boolean canCastSV() {
+        if (!globalMethodProvider.magic.open()) {
+            globalMethodProvider.log("Unable to open magic tab");
+            return false;
+        }
+        RS2Widget shadowVeilSpellWidget = globalMethodProvider.widgets.singleFilter(218, rs2Widget -> rs2Widget.getSpellName().contains("Shadow Veil"));
+        if (shadowVeilSpellWidget.getSpriteIndex1() == 1334 || globalMethodProvider.skills.getStatic(Skill.MAGIC) < 47) {
+            globalMethodProvider.log("Unable to cast Shadow veil, Widget is using blacked out || is on cooldown || < 47 magic, ");
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -34,15 +46,15 @@ public class CastShadowVeilTask extends Task implements MessageListener {
     @Override
     public void runTask() throws InterruptedException {
         // Once magic.canCast returns false, never run this task again.
-        if(canCast) {
+        if (canCast) {
             canCast = canCastSV();
-            if(!canCast) {
+            if (!canCast) {
                 log("canCast(SHADOW_VEIL) returned false, will no longer cast S.V. this script session.");
                 return;
             }
         }
         ScriptPaint.setStatus("Casting shadow veil");
-        if(!RetryUtil.retry(() -> magic.castSpell(Spells.ArceuusSpells.SHADOW_VEIL), 5, 600)) {
+        if (!RetryUtil.retry(() -> magic.castSpell(Spells.ArceuusSpells.SHADOW_VEIL), 5, 600)) {
             warn("Unable to cast shadow veil spell.");
         }
         tabs.open(Tab.INVENTORY);
@@ -50,10 +62,10 @@ public class CastShadowVeilTask extends Task implements MessageListener {
 
     @Override
     public void onMessage(Message message) {
-        if(message.getType() != Message.MessageType.GAME)
+        if (message.getType() != Message.MessageType.GAME)
             return;
         String msg = message.getMessage();
-        if(msg.contains("Your Shadow Veil")) {
+        if (msg.contains("Your Shadow Veil")) {
             this.isSvActive = false;
             int delay = RngUtil.gaussian(20000, 3000, 0, 40000);
             this.nextSVTimestamp = System.currentTimeMillis() + delay;
@@ -61,19 +73,6 @@ public class CastShadowVeilTask extends Task implements MessageListener {
         } else if (msg.contains("Your thieving abilities")) {
             this.isSvActive = true;
         }
-    }
-
-    public static boolean canCastSV() {
-        if(!globalMethodProvider.magic.open()) {
-            globalMethodProvider.log("Unable to open magic tab");
-            return false;
-        }
-        RS2Widget shadowVeilSpellWidget = globalMethodProvider.widgets.singleFilter(218, rs2Widget -> rs2Widget.getSpellName().contains("Shadow Veil"));
-        if(shadowVeilSpellWidget.getSpriteIndex1() == 1334 || globalMethodProvider.skills.getStatic(Skill.MAGIC) < 47) {
-            globalMethodProvider.log("Unable to cast Shadow veil, Widget is using blacked out || is on cooldown || < 47 magic, ");
-            return false;
-        }
-        return true;
     }
     // Too late, they're dead.
 }

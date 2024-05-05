@@ -22,16 +22,8 @@ public enum FoodUtil {
         this.healthRestoreAmount = healthRestoreAmount;
     }
 
-    public String getItemName() {
-        return itemName;
-    }
-
-    public int getHealthRestoreAmount() {
-        return healthRestoreAmount;
-    }
-
     public static int getHealAmountForFoodItem(Item item) {
-        if(item == null)
+        if (item == null)
             return 0;
         String itemName = item.getName();
         FoodUtil matchingEnum = null;
@@ -59,15 +51,23 @@ public enum FoodUtil {
         boolean found = false;
         int idx = 0;
         Item[] items = globalMethodProvider.inventory.getItems();
-        for(; idx < 28; idx++) {
+        for (; idx < 28; idx++) {
             int healAmount = getHealAmountForFoodItem(items[idx]);
-            if(healAmount > 0 && maxHp - currentHp >= healAmount) {
+            if (healAmount > 0 && maxHp - currentHp >= healAmount) {
                 found = true;
                 break;
             }
         }
 
         return found ? idx : -1;
+    }
+
+    public String getItemName() {
+        return itemName;
+    }
+
+    public int getHealthRestoreAmount() {
+        return healthRestoreAmount;
     }
 
 }

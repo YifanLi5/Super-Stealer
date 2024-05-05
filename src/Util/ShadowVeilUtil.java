@@ -12,14 +12,13 @@ import static Util.GlobalMethodProvider.globalMethodProvider;
 
 public class ShadowVeilUtil implements MessageListener {
 
-    public static boolean isSvOffCooldown = true;
     private static final String[] fireRune = {"Fire rune", "Lava rune", "Smoke rune", "Steam rune"};
     private static final String[] earthRune = {"Earth rune", "Lava rune", "Dust rune", "Mud rune"};
-
+    public static boolean isSvOffCooldown = true;
     private static MessageListener messageListenerInstance;
 
     public static MessageListener initMessageListener(Bot bot) {
-        if(messageListenerInstance == null) {
+        if (messageListenerInstance == null) {
             messageListenerInstance = new ShadowVeilUtil();
             bot.addMessageListener(messageListenerInstance);
         }
@@ -27,21 +26,8 @@ public class ShadowVeilUtil implements MessageListener {
         return messageListenerInstance;
     }
 
-    @Override
-    public void onMessage(Message message) {
-        if(message.getType() != Message.MessageType.GAME)
-            return;
-        String msg = message.getMessage();
-        if(msg.contains("Your Shadow Veil")) {
-            globalMethodProvider.log("shadow veil is ready.");
-            isSvOffCooldown = true;
-        } else if (msg.contains("Your thieving abilities")) {
-            isSvOffCooldown = false;
-        }
-    }
-
     public static int getNumShadowVeilCasts() throws InterruptedException {
-        if(!canCastSV())
+        if (!canCastSV())
             return 0;
 
         int fireRuneSource = globalMethodProvider.inventory.contains(fireRune) ? (int) globalMethodProvider.inventory.getAmount(fireRune) : Integer.MAX_VALUE;
@@ -53,15 +39,28 @@ public class ShadowVeilUtil implements MessageListener {
 
     //placeholder for magic.canCast(SHADOW_VEIL), it doesn't work atm.
     public static boolean canCastSV() {
-        if(!globalMethodProvider.magic.open()) {
+        if (!globalMethodProvider.magic.open()) {
             globalMethodProvider.log("Unable to open magic tab");
             return false;
         }
         RS2Widget shadowVeilSpellWidget = globalMethodProvider.widgets.singleFilter(218, rs2Widget -> rs2Widget.getSpellName().contains("Shadow Veil"));
-        if(shadowVeilSpellWidget.getSpriteIndex1() == 1334 || globalMethodProvider.skills.getStatic(Skill.MAGIC) < 47) {
+        if (shadowVeilSpellWidget.getSpriteIndex1() == 1334 || globalMethodProvider.skills.getStatic(Skill.MAGIC) < 47) {
             globalMethodProvider.log("Unable to cast Shadow veil, Widget is using blacked out sprite or < 47 magic, ");
             return false;
         }
         return true;
+    }
+
+    @Override
+    public void onMessage(Message message) {
+        if (message.getType() != Message.MessageType.GAME)
+            return;
+        String msg = message.getMessage();
+        if (msg.contains("Your Shadow Veil")) {
+            globalMethodProvider.log("shadow veil is ready.");
+            isSvOffCooldown = true;
+        } else if (msg.contains("Your thieving abilities")) {
+            isSvOffCooldown = false;
+        }
     }
 }

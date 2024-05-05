@@ -1,8 +1,8 @@
-import UI.NPCSelectionPainter;
-import UI.ScriptPaint;
 import Task.Subclasses.*;
 import Task.Subclasses.Failsafes.EmergencyEat;
 import Task.Task;
+import UI.NPCSelectionPainter;
+import UI.ScriptPaint;
 import Util.*;
 import org.osbot.rs07.api.map.constants.Banks;
 import org.osbot.rs07.api.model.NPC;
@@ -24,9 +24,9 @@ public class MainScript extends Script {
     public void onStart() throws InterruptedException {
         super.onStart();
         int emptySlotsNeeded = 2;
-        if(inventory.contains("Coins"))
+        if (inventory.contains("Coins"))
             emptySlotsNeeded--;
-        if(inventory.contains("Coin pouch"))
+        if (inventory.contains("Coin pouch"))
             emptySlotsNeeded--;
         if (inventory.getEmptySlots() < emptySlotsNeeded) {
             warn("You need room for coin pouch + coins." +
@@ -55,7 +55,7 @@ public class MainScript extends Script {
         new EmergencyEat(this.bot);
 
         NPC pickpocketTarget = PickpocketUtil.getPickpocketTarget();
-        if(Banks.ARDOUGNE_SOUTH.contains(myPosition())) {
+        if (Banks.ARDOUGNE_SOUTH.contains(myPosition())) {
             assert pickpocketTarget != null;
             if (pickpocketTarget.getName().equals("Knight of Ardougne")) {
                 log("Player is at mass ardy knights (in Ardy S. Bank). Will stop if they exit the bank.");
@@ -64,7 +64,7 @@ public class MainScript extends Script {
         }
         new OpenCoinPouchesTask(this.bot);
         new EquipDodgyNecklaceTask(this.bot);
-        if(CastShadowVeilTask.canCastSV()) {
+        if (CastShadowVeilTask.canCastSV()) {
             new CastShadowVeilTask(this.bot);
         }
         new BankTask(this.bot);
@@ -82,13 +82,13 @@ public class MainScript extends Script {
 
     @Override
     public int onLoop() throws InterruptedException {
-        if(Task.stopScriptNow) {
+        if (Task.stopScriptNow) {
             stop(false);
             return 5000;
         }
 
         Task task = Task.nextTask();
-        if(task != null) {
+        if (task != null) {
             task.runTask();
         }
         return RngUtil.gaussian(250, 50, 0, 350);
@@ -98,11 +98,11 @@ public class MainScript extends Script {
     public void onStop() throws InterruptedException {
         super.onStop();
         Task.cleanupTasks(bot);
-        if(scriptPaint != null)
+        if (scriptPaint != null)
             scriptPaint.onStopCleanup();
-        if(selectionPainter != null)
+        if (selectionPainter != null)
             selectionPainter.onStopCleanup();
-        if(svMessageListener != null)
+        if (svMessageListener != null)
             this.bot.removeMessageListener(svMessageListener);
     }
 }

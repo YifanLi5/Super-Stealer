@@ -2,7 +2,6 @@ package Util;
 
 import org.osbot.rs07.api.Diaries;
 import org.osbot.rs07.api.def.NPCDefinition;
-import org.osbot.rs07.api.filter.Filter;
 import org.osbot.rs07.api.map.Position;
 import org.osbot.rs07.api.model.NPC;
 import org.osbot.rs07.api.ui.Option;
@@ -15,7 +14,6 @@ import org.osbot.rs07.utility.ConditionalSleep2;
 import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import static Util.GlobalMethodProvider.globalMethodProvider;
 
@@ -32,8 +30,8 @@ public class PickpocketUtil {
     }
 
     public static NPC getPickpocketTarget() throws InterruptedException {
-        if(pickpocketTarget == null || !pickpocketTarget.exists()) {
-            if(!setPickpocketTarget()) {
+        if (pickpocketTarget == null || !pickpocketTarget.exists()) {
+            if (!setPickpocketTarget()) {
                 return null;
             }
         }
@@ -46,7 +44,7 @@ public class PickpocketUtil {
 
     public static boolean setPickpocketTarget() throws InterruptedException {
         int attempts = 0;
-        while((pickpocketTarget == null || !pickpocketTarget.exists()) && attempts < 10) {
+        while ((pickpocketTarget == null || !pickpocketTarget.exists()) && attempts < 10) {
             attempts++;
             globalMethodProvider.log(String.format("Npc instance is null. Attempting to locate a new npc instance. %d/10", attempts));
             pickpocketTarget = globalMethodProvider.npcs.closest(PickpocketUtil.getSelectedNPCIds());
@@ -57,15 +55,15 @@ public class PickpocketUtil {
     }
 
     public static boolean pickpocketTarget() throws InterruptedException {
-        if(pickpocketTarget == null || !pickpocketTarget.exists()) {
-            if(!setPickpocketTarget()) {
+        if (pickpocketTarget == null || !pickpocketTarget.exists()) {
+            if (!setPickpocketTarget()) {
                 return false;
             }
         }
 
-        if(!globalMethodProvider.map.canReach(pickpocketTarget)) {
+        if (!globalMethodProvider.map.canReach(pickpocketTarget)) {
             globalMethodProvider.log("Unable to reach the target. Will attempt to use DoorHandler.");
-            if(!globalMethodProvider.doorHandler.handleNextObstacle(pickpocketTarget)) {
+            if (!globalMethodProvider.doorHandler.handleNextObstacle(pickpocketTarget)) {
                 globalMethodProvider.log("Door handler failed, using backup.");
                 pickpocketTarget = globalMethodProvider.npcs.closest(npc ->
                         Arrays.stream(PickpocketUtil.getSelectedNPCIds()).anyMatch(n -> n == npc.getId())
@@ -73,7 +71,7 @@ public class PickpocketUtil {
                 );
                 return pickpocketTarget();
             }
-            if(!ConditionalSleep2.sleep(10000, () -> globalMethodProvider.map.canReach(pickpocketTarget))) {
+            if (!ConditionalSleep2.sleep(10000, () -> globalMethodProvider.map.canReach(pickpocketTarget))) {
                 return false;
             }
             globalMethodProvider.log("Door handler succeeded.");
@@ -83,11 +81,11 @@ public class PickpocketUtil {
         boolean interactionSuccessful = false;
         InteractionEvent ppEvent = new InteractionEvent(pickpocketTarget, PICKPOCKET);
         ppEvent.setOperateCamera(false);
-        while(!ppEvent.hasFinished() && attempts < 10) {
+        while (!ppEvent.hasFinished() && attempts < 10) {
             globalMethodProvider.execute(ppEvent);
             attempts++;
             interactionSuccessful = ppEvent.hasFinished();
-            if(!interactionSuccessful) {
+            if (!interactionSuccessful) {
                 ppEvent = new InteractionEvent(pickpocketTarget, PICKPOCKET);
                 ppEvent.setOperateCamera(false);
             }
@@ -97,8 +95,8 @@ public class PickpocketUtil {
 
     public static boolean isPlayerAdjacentToPickpocketNPC() throws InterruptedException {
         Position myPlayerPosition = globalMethodProvider.myPosition();
-        if(pickpocketTarget == null || !pickpocketTarget.exists()) {
-            if(!setPickpocketTarget()) {
+        if (pickpocketTarget == null || !pickpocketTarget.exists()) {
+            if (!setPickpocketTarget()) {
                 return false;
             }
         }
@@ -111,7 +109,7 @@ public class PickpocketUtil {
     }
 
     public static boolean menuHoverPickpocketOption() throws InterruptedException {
-        if(globalMethodProvider.menu.isOpen()) {
+        if (globalMethodProvider.menu.isOpen()) {
             return globalMethodProvider.menu.getMenu()
                     .stream()
                     .filter(option -> option.action.equals("Pickpocket"))
@@ -119,18 +117,18 @@ public class PickpocketUtil {
                     .orElse(null) != null;
         }
 
-        if(!setPickpocketTarget()) {
+        if (!setPickpocketTarget()) {
             globalMethodProvider.warn("Error: Unable to find a pickpocket NPC to menu hover pickpocket option.");
             globalMethodProvider.bot.getScriptExecutor().stop(false);
             return false;
         }
         EntityDestination ed = new EntityDestination(globalMethodProvider.bot, pickpocketTarget);
-        if(!globalMethodProvider.mouse.click(ed, true)) {
+        if (!globalMethodProvider.mouse.click(ed, true)) {
             globalMethodProvider.log("Unable to right click on pickpocket NPC to menu hover pickpocket option.");
             return false;
         }
         boolean menuOpened = ConditionalSleep2.sleep(1000, () -> globalMethodProvider.menu.isOpen());
-        if(!menuOpened) {
+        if (!menuOpened) {
             globalMethodProvider.log("Menu is not open.");
             return false;
         }
@@ -141,7 +139,7 @@ public class PickpocketUtil {
                 .findFirst()
                 .map(option -> globalMethodProvider.menu.getOptionRectangle(options.indexOf(option)))
                 .orElse(null);
-        if(optionRec == null) {
+        if (optionRec == null) {
             globalMethodProvider.log("Opened menu does not contain option to pickpocket");
             Rectangle menuRectangle = globalMethodProvider.menu.getRectangle();
 
@@ -161,11 +159,11 @@ public class PickpocketUtil {
     }
 
     public static int getMaxPossibleCoinPouchStack() {
-        if(globalMethodProvider.diaries.isComplete(Diaries.Diary.ARDOUGNE_ELITE))
+        if (globalMethodProvider.diaries.isComplete(Diaries.Diary.ARDOUGNE_ELITE))
             return 140;
-        else if(globalMethodProvider.diaries.isComplete(Diaries.Diary.ARDOUGNE_HARD))
+        else if (globalMethodProvider.diaries.isComplete(Diaries.Diary.ARDOUGNE_HARD))
             return 84;
-        else if(globalMethodProvider.diaries.isComplete(Diaries.Diary.ARDOUGNE_MEDIUM))
+        else if (globalMethodProvider.diaries.isComplete(Diaries.Diary.ARDOUGNE_MEDIUM))
             return 56;
         else
             return 28;

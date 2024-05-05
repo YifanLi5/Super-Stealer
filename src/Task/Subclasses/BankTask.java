@@ -1,7 +1,7 @@
 package Task.Subclasses;
 
-import UI.ScriptPaint;
 import Task.Task;
+import UI.ScriptPaint;
 import Util.BankAreaUtil;
 import Util.PouchUtil;
 import Util.RetryUtil;
@@ -14,17 +14,16 @@ import org.osbot.rs07.api.model.Entity;
 import org.osbot.rs07.api.ui.Skill;
 import org.osbot.rs07.utility.ConditionalSleep2;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class BankTask extends Task {
 
-    private static class WalkBackParameters {
-        Area returnArea;
-        boolean usedWebWalk;
-    }
-
     private final WalkBackParameters walkBackParameters = new WalkBackParameters();
+
     public BankTask(Bot bot) {
         super(bot);
     }
@@ -35,30 +34,29 @@ public class BankTask extends Task {
                 || inventory.isFull();
     }
 
-
     @Override
     public void runTask() throws InterruptedException {
-        if(StartingEquipmentUtil.getStartingInventory().keySet().isEmpty()) {
+        if (StartingEquipmentUtil.getStartingInventory().keySet().isEmpty()) {
             stopScriptNow("Starting equipment was empty inventory will not restock. Stopping now.");
             return;
         }
 
-        if(!PouchUtil.openPouches()) {
+        if (!PouchUtil.openPouches()) {
             stopScriptNow("Unable to open-all pouches prior to banking");
             return;
         }
 
-        if(!walkToAndOpenNearestBank()) {
+        if (!walkToAndOpenNearestBank()) {
             stopScriptNow("Unable to walk back to nearest bank.");
             return;
         }
 
         boolean bankingSuccess = bank.isOpen() && depositNonStartingItems() && restoreStartingInventory();
-        if(!bankingSuccess) {
+        if (!bankingSuccess) {
             stopScriptNow("Unable to preform banking operations successfully");
             return;
         }
-        if(!returnToPickPocketArea())
+        if (!returnToPickPocketArea())
             stopScriptNow("Unable to return back to pickpocket area");
 
     }
@@ -75,17 +73,17 @@ public class BankTask extends Task {
         walkBackParameters.returnArea = returnArea;
         walkBackParameters.usedWebWalk = useWW;
 
-        if(useWW) {
+        if (useWW) {
             ScriptPaint.setStatus("Banking :: Webwalking to bank");
             log("Attempting to webwalk to bank.");
-            if(!walking.webWalk(BankAreaUtil.getAccessibleBanks(bot.getMethods()))) {
+            if (!walking.webWalk(BankAreaUtil.getAccessibleBanks(bot.getMethods()))) {
                 warn("Failed to webwalk to bank.");
                 return false;
             }
-        } else if(useWalk || !map.canReach(bankingEntity)) {
+        } else if (useWalk || !map.canReach(bankingEntity)) {
             ScriptPaint.setStatus("Banking :: walking to bank");
             log("Attempting to walk to bank entity @ " + bankingEntity.getPosition());
-            if(!walking.walk(bankingEntity.getArea(3))) {
+            if (!walking.walk(bankingEntity.getArea(3))) {
                 warn("Failed to walk to bank.");
                 return false;
             }
@@ -113,19 +111,19 @@ public class BankTask extends Task {
         StartingEquipmentUtil.logInventoryDefinition(diff);
 
         String errorMsg = null;
-        for(Map.Entry<ItemDefinition, Integer> diffItemDef: diff.entrySet()) {
-            if(diffItemDef.getKey().getName().endsWith("rune"))
+        for (Map.Entry<ItemDefinition, Integer> diffItemDef : diff.entrySet()) {
+            if (diffItemDef.getKey().getName().endsWith("rune"))
                 continue;
             int itemId = diffItemDef.getKey().getId();
             int amount = diffItemDef.getValue();
-            if(amount <= 0)
+            if (amount <= 0)
                 continue;
-            if(bank.getAmount(itemId) < amount) {
+            if (bank.getAmount(itemId) < amount) {
                 errorMsg = String.format("Insufficient amount of item %s to continue.", diffItemDef.getKey().getName());
                 break;
             }
 
-            if(!RetryUtil.retry(() -> bank.withdraw(itemId, amount), 5, 1000)) {
+            if (!RetryUtil.retry(() -> bank.withdraw(itemId, amount), 5, 1000)) {
                 errorMsg = String.format(
                         "Failed to withdraw item: %s | amount: %d",
                         diffItemDef.getKey().getName(), diffItemDef.getValue()
@@ -134,7 +132,7 @@ public class BankTask extends Task {
             }
             sleep(600);
         }
-        if(errorMsg != null) {
+        if (errorMsg != null) {
             stopScriptNow(errorMsg);
             return false;
         }
@@ -142,28 +140,32 @@ public class BankTask extends Task {
     }
 
     private boolean returnToPickPocketArea() {
-        if(bank.isOpen())
+        if (bank.isOpen())
             bank.close();
 
-        if(this.walkBackParameters.usedWebWalk) {
+        if (this.walkBackParameters.usedWebWalk) {
             ScriptPaint.setStatus("Banking :: Webwalking back to thieve >:)");
-            if(!walking.webWalk(this.walkBackParameters.returnArea)) {
+            if (!walking.webWalk(this.walkBackParameters.returnArea)) {
                 warn("Failed to webwalk to back to thieve-able NPCs.");
                 return false;
             }
-        }
-        else {
+        } else {
             ScriptPaint.setStatus("Banking :: Walking back to thieve >:)");
-            if(!walking.walk(this.walkBackParameters.returnArea)) {
+            if (!walking.walk(this.walkBackParameters.returnArea)) {
                 warn("Failed to walk to back to thieve-able NPCs.");
                 return false;
             }
         }
-        if(!ConditionalSleep2.sleep(15000, () -> this.walkBackParameters.returnArea.contains(myPosition()))) {
+        if (!ConditionalSleep2.sleep(15000, () -> this.walkBackParameters.returnArea.contains(myPosition()))) {
             warn("Player is not back at returnArea after banking.");
             return false;
         }
         return true;
 
+    }
+
+    private static class WalkBackParameters {
+        Area returnArea;
+        boolean usedWebWalk;
     }
 }

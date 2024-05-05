@@ -1,16 +1,10 @@
 package Task.Subclasses;
 
-import UI.ScriptPaint;
 import Task.Task;
+import UI.ScriptPaint;
 import Util.PickpocketUtil;
 import Util.PouchUtil;
-import Util.RetryUtil;
 import org.osbot.rs07.Bot;
-import org.osbot.rs07.utility.ConditionalSleep2;
-
-import java.util.concurrent.Callable;
-
-import static Util.GlobalMethodProvider.globalMethodProvider;
 
 
 public class OpenCoinPouchesTask extends Task {
@@ -36,7 +30,7 @@ public class OpenCoinPouchesTask extends Task {
         log("Opening pouches, next open @ " + (maxCoinPouches - nextOpenOffset));
         ScriptPaint.setStatus("Opening pouches");
 
-        if(!PouchUtil.openPouches()) {
+        if (!PouchUtil.openPouches()) {
             stopScriptNow("Unable to open-all coin pouches");
         }
     }
