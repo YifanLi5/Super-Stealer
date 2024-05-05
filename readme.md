@@ -25,7 +25,7 @@ Adjust accordingly for different NPCs.**
   * AFK
 - Dodgy Necklace support
   * Start with necklaces in inventory
-- - Shadow veil
+- Shadow veil
   * Start with staff/runes in inventory
 - Adjusts Maximum coin pouch stack based on character's Ardougne diary progression. 
   * (None/Easy/: 28, Medium: 56, Hard: 84, Elite: 140)
