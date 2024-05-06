@@ -12,17 +12,12 @@ import static Util.GlobalMethodProvider.globalMethodProvider;
 
 public class CastShadowVeilTask extends Task implements MessageListener {
     boolean canCast = true;
-    boolean isSvActive;
+    boolean isSvActive = false;
     long nextSVTimestamp = 0;
 
     public CastShadowVeilTask(Bot bot) {
         super(bot);
         bot.addMessageListener(this);
-
-        if (magic.open()) {
-            RS2Widget svWidget = widgets.singleFilter(218, rs2Widget -> rs2Widget.getSpellName().contains("Shadow Veil"));
-            isSvActive = svWidget != null && svWidget.getAlpha() < 150;
-        }
     }
 
     public static boolean canCastSV() {

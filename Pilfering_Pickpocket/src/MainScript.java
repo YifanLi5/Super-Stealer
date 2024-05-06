@@ -14,7 +14,7 @@ import org.osbot.rs07.script.ScriptManifest;
 
 import static Util.PickpocketUtil.PICKPOCKET;
 
-@ScriptManifest(author = "yfoo", name = "Pilfering Pickpocket", info = "Mark target NPC to have this bot to pickpocket them!", version = 1.0, logo = "")
+@ScriptManifest(author = "yfoo", name = "[2] Pilfering Pickpocket", info = "Mark target NPC to have this bot to pickpocket them!", version = 1.0, logo = "")
 public class MainScript extends Script {
 
     ScriptPaint scriptPaint;
@@ -36,10 +36,15 @@ public class MainScript extends Script {
             return;
         }
 
-        RetryUtil.retry(
+        boolean hideNPCAttackOptions = RetryUtil.retry(
                 () -> settings.setSetting(Settings.AllSettingsTab.CONTROLS, "NPC Attack options", "Hidden"),
                 5, 2500
-        );
+        ) && widgets.closeOpenInterface();
+
+        if(!hideNPCAttackOptions) {
+            warn("Error attempting to set npc atk options to hidden.");
+            stop(false);
+        }
 
         // Share MethodProvider for UtilClasses
         GlobalMethodProvider.globalMethodProvider = this.bot.getMethods();
