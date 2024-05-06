@@ -14,7 +14,7 @@ import org.osbot.rs07.script.ScriptManifest;
 
 import static Util.PickpocketUtil.PICKPOCKET;
 
-@ScriptManifest(author = "yfoo", name = "[2] Pilfering Pickpocket", info = "Mark target NPC to have this bot to pickpocket them!", version = 1.0, logo = "")
+@ScriptManifest(author = "yfoo", name = "[3] Pilfering Pickpocket", info = "Mark target NPC to have this bot to pickpocket them!", version = 1.0, logo = "")
 public class MainScript extends Script {
 
     ScriptPaint scriptPaint;
@@ -36,14 +36,21 @@ public class MainScript extends Script {
             return;
         }
 
-        boolean hideNPCAttackOptions = RetryUtil.retry(
-                () -> settings.setSetting(Settings.AllSettingsTab.CONTROLS, "NPC Attack options", "Hidden"),
-                5, 2500
-        ) && widgets.closeOpenInterface();
 
-        if(!hideNPCAttackOptions) {
-            warn("Error attempting to set npc atk options to hidden.");
-            stop(false);
+
+        boolean isNPCAtkHidden = configs.isSet(1306, 3);
+        log("isNPCAtkHidden: " + isNPCAtkHidden);
+        if(!isNPCAtkHidden) {
+            log("Attempting to set NPC attack options to hidden...");
+            isNPCAtkHidden = RetryUtil.retry(
+                    () -> settings.setSetting(Settings.AllSettingsTab.CONTROLS, "NPC Attack options", "Hidden"),
+                    5, 2500
+            ) && widgets.closeOpenInterface();
+
+            if(!isNPCAtkHidden) {
+                warn("Error attempting to set npc atk options to hidden.");
+                stop(false);
+            }
         }
 
         // Share MethodProvider for UtilClasses
