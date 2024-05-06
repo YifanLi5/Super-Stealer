@@ -50,6 +50,5 @@ Adjust accordingly for different NPCs.**
 
 ## Todo List:
 - check if splash host is still splashing (If doing mass ardy knight)
-- Set npc atk options to hidden, (so pickpocket is always left click option)
 - Add emergency run away, if player is under attack
 - cli support, (save start location + inventory setup + npc selection)
