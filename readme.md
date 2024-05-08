@@ -1,5 +1,7 @@
 # Super Stealer : Mark & Thieve
 
+![super_stealer_logo.jpg](readme_imgs%2Fsuper_stealer_logo.jpg)
+
 Osbot thieving script for pickpocketing any valid NPC in the game!
 
 ## Setup:
