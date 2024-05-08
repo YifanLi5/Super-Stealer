@@ -30,7 +30,7 @@ public class BankTask extends Task {
 
     @Override
     public boolean shouldRun() {
-        return (inventory.filter(new ActionFilter<>("Eat", "Drink")).isEmpty() && skills.getDynamic(Skill.HITPOINTS) <= 5)
+        return (inventory.filter(new ActionFilter<>("Eat", "Drink")).isEmpty() && skills.getDynamic(Skill.HITPOINTS) <= 25)
                 || inventory.isFull();
     }
 
