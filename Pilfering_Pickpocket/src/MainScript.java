@@ -14,7 +14,7 @@ import org.osbot.rs07.script.ScriptManifest;
 
 import static Util.PickpocketUtil.PICKPOCKET;
 
-@ScriptManifest(author = "yfoo", name = "[3] Pilfering Pickpocket", info = "Mark target NPC to have this bot to pickpocket them!", version = 1.0, logo = "")
+@ScriptManifest(author = "yfoo", name = "Super Stealer", info = "Mark target NPC to have this bot to pickpocket them!", version = 1.0, logo = "https://github.com/YifanLi5/Super-Stealer/blob/master/readme_imgs/super_stealer_logo.jpg?raw=true")
 public class MainScript extends Script {
 
     ScriptPaint scriptPaint;
