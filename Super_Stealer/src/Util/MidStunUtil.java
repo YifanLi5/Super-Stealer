@@ -1,6 +1,7 @@
 package Util;
 
 import UI.ScriptPaint;
+import Util.Enums.FoodEnum;
 import org.osbot.rs07.api.filter.ActionFilter;
 import org.osbot.rs07.api.model.Item;
 import org.osbot.rs07.utility.ConditionalSleep2;
@@ -12,8 +13,7 @@ import static Util.GlobalMethodProvider.globalMethodProvider;
 import static org.osbot.rs07.script.MethodProvider.sleep;
 
 public class MidStunUtil {
-
-    private final static String[] junk = {"Jug", "Bowl", "Vial", "Pie dish"};
+    public final static String[] junk = {"Jug", "Bowl", "Vial", "Pie dish"};
     public static int approxVerticesCountStunned;
 
     public static boolean isPlayerStunned() {
@@ -21,7 +21,7 @@ public class MidStunUtil {
     }
 
     public static void eat() throws InterruptedException {
-        int nextFoodSlot = FoodUtil.getInvSlotContainingFoodWithoutOverheal();
+        int nextFoodSlot = FoodEnum.getInvSlotContainingFoodWithoutOverheal();
         if (nextFoodSlot == -1) {
             globalMethodProvider.log("Using healing item not in FoodUtil, May overheal");
             nextFoodSlot = globalMethodProvider.inventory.getSlot(new ActionFilter<>("Eat", "Drink"));
@@ -50,7 +50,7 @@ public class MidStunUtil {
 
     public static void no_op() {
         ScriptPaint.setStatus("MidStun - no_op");
-        ConditionalSleep2.sleep(3000, () -> !MidStunUtil.isPlayerStunned());
+        ConditionalSleep2.sleep(5000, () -> !MidStunUtil.isPlayerStunned());
     }
 
     public static void extendedNo_op() throws InterruptedException {
@@ -80,8 +80,6 @@ public class MidStunUtil {
         if (globalMethodProvider.inventory.contains(junk)) {
             ScriptPaint.setStatus("MidStun - drop junk");
             globalMethodProvider.inventory.dropAll(junk);
-
         }
-
     }
 }

@@ -1,11 +1,13 @@
-package Util;
+package Util.Enums;
 
 import org.osbot.rs07.api.model.Item;
 import org.osbot.rs07.api.ui.Skill;
 
+import java.util.Arrays;
+
 import static Util.GlobalMethodProvider.globalMethodProvider;
 
-public enum FoodUtil {
+public enum FoodEnum {
     TROUT("Trout", 7),
     SALMON("Salmon", 9),
     TUNA("Tuna", 10),
@@ -17,7 +19,7 @@ public enum FoodUtil {
     private final String itemName;
     private final int healthRestoreAmount;
 
-    FoodUtil(String itemName, int healthRestoreAmount) {
+    FoodEnum(String itemName, int healthRestoreAmount) {
         this.itemName = itemName;
         this.healthRestoreAmount = healthRestoreAmount;
     }
@@ -26,18 +28,16 @@ public enum FoodUtil {
         if (item == null)
             return 0;
         String itemName = item.getName();
-        FoodUtil matchingEnum = null;
-        for (FoodUtil foodEnum : FoodUtil.values()) {
-            if (foodEnum.getItemName().equalsIgnoreCase(itemName)) {
-                matchingEnum = foodEnum;
-                break;
-            }
-        }
+        FoodEnum matchingEnum = Arrays.stream(FoodEnum.values())
+                .filter(enumItem -> enumItem.getItemName().equalsIgnoreCase(itemName))
+                .findFirst()
+                .orElse(null);
+
         return matchingEnum == null ? 0 : matchingEnum.healthRestoreAmount;
     }
 
     public static String[] getAllFoodNames() {
-        FoodUtil[] allFoods = FoodUtil.values();
+        FoodEnum[] allFoods = FoodEnum.values();
         String[] foodNames = new String[allFoods.length];
         for (int i = 0; i < allFoods.length; i++) {
             foodNames[i] = allFoods[i].getItemName();

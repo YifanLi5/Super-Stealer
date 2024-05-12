@@ -70,7 +70,7 @@ public class MainScript extends Script {
 
         // high -> low priority of tasks
         new EmergencyEat(this.bot);
-        new RunAway(this.bot);
+        //new RunAway(this.bot);
 
         NPC pickpocketTarget = PickpocketUtil.getPickpocketTarget();
         if (Banks.ARDOUGNE_SOUTH.contains(myPosition())) {

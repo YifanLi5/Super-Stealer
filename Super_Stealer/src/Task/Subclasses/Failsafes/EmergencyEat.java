@@ -2,7 +2,7 @@ package Task.Subclasses.Failsafes;
 
 import Task.Task;
 import UI.ScriptPaint;
-import Util.FoodUtil;
+import Util.Enums.FoodEnum;
 import Util.RetryUtil;
 import org.osbot.rs07.Bot;
 import org.osbot.rs07.api.filter.ActionFilter;
@@ -24,7 +24,7 @@ public class EmergencyEat extends Task {
     public void runTask() throws InterruptedException {
         ScriptPaint.setStatus("Emergency Eating");
         log("Emergency Eat!");
-        int nextFoodSlot = FoodUtil.getInvSlotContainingFoodWithoutOverheal();
+        int nextFoodSlot = FoodEnum.getInvSlotContainingFoodWithoutOverheal();
         if (nextFoodSlot == -1) {
             log("Using healing item not in FoodUtil, May overheal");
             nextFoodSlot = inventory.getSlot(new ActionFilter<>("Eat", "Drink"));

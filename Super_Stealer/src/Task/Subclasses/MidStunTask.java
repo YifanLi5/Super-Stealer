@@ -1,42 +1,25 @@
 package Task.Subclasses;
 
 import Task.Task;
+import Util.Enums.MidStunActionsEnum;
 import Util.MidStunUtil;
 import Util.PickpocketUtil;
 import Util.RngUtil;
 import org.osbot.rs07.Bot;
-import org.osbot.rs07.api.filter.ActionFilter;
 import org.osbot.rs07.api.model.NPC;
 import org.osbot.rs07.api.ui.Skill;
 import org.osbot.rs07.utility.ConditionalSleep2;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
-
-import static Util.GlobalMethodProvider.globalMethodProvider;
 
 public class MidStunTask extends Task {
 
-    private final static String[] junk = {"Jug", "Bowl", "Vial"};
     private int eatAtHpPercentage;
 
-    public MidStunTask(Bot bot) throws InterruptedException {
+    public MidStunTask(Bot bot) {
         super(bot);
-        StringBuilder builder = new StringBuilder("***Mid Stun Action Weighting***\n");
-        for (MidStunActions action : MidStunActions.values()) {
-            builder.append(String.format("%s / %d\n",
-                            action.name(),
-                            action.executionWeight
-                    )
-            );
-        }
-        log(builder);
-
-
-
         this.eatAtHpPercentage = RngUtil.gaussian(50, 10, 35, 70);
         log("initial eatAtHpPercentage -> " + this.eatAtHpPercentage);
     }
@@ -54,7 +37,7 @@ public class MidStunTask extends Task {
             script.stop(LOGOUT_ON_SCRIPT_STOP);
             return;
         }
-        MidStunActions action = rollForAction();
+        MidStunActionsEnum action = rollForAction();
         if (action == null) {
             return;
         }
@@ -70,6 +53,7 @@ public class MidStunTask extends Task {
                 }
                 break;
             case NO_OP:
+                MidStunUtil.no_op();
                 break;
             case EXTENDED_NO_OP:
                 MidStunUtil.extendedNo_op();
@@ -90,9 +74,9 @@ public class MidStunTask extends Task {
         }
     }
 
-    private MidStunActions rollForAction() {
+    private MidStunActionsEnum rollForAction() {
 
-        List<MidStunActions> validActions = Arrays.stream(MidStunActions.values()).filter(action -> {
+        List<MidStunActionsEnum> validActions = Arrays.stream(MidStunActionsEnum.values()).filter(action -> {
             try {
                 return action.canRun.call();
             } catch (Exception e) {
@@ -101,12 +85,12 @@ public class MidStunTask extends Task {
             }
         }).collect(Collectors.toList());
 
-        MidStunActions selectedAction = null;
+        MidStunActionsEnum selectedAction = null;
         int weightSum = validActions.stream()
                 .mapToInt(action -> action.executionWeight)
                 .sum();
         int roll = random(1, weightSum);
-        for (MidStunActions action : validActions) {
+        for (MidStunActionsEnum action : validActions) {
             roll -= action.executionWeight;
             if (roll <= 0) {
                 selectedAction = action;
@@ -124,37 +108,5 @@ public class MidStunTask extends Task {
     private int playersHealthPercent() {
         double result = ((double) skills.getDynamic(Skill.HITPOINTS) / skills.getStatic(Skill.HITPOINTS)) * 100;
         return (int) Math.round(result);
-    }
-
-    private enum MidStunActions {
-        EAT(RngUtil.gaussian(1000, 250, 300, 1700), () ->
-                globalMethodProvider.myPlayer().getHealthPercentCache() < 65
-                        && globalMethodProvider.inventory.contains(new ActionFilter<>("Eat", "Drink"))
-                , false
-        ),
-        NO_OP(RngUtil.gaussian(500, 100, 300, 700), () -> true, true),
-        EXTENDED_NO_OP(RngUtil.gaussian(50, 25, 0, 150), () -> true, true),
-        SPAM_PICKPOCKET(RngUtil.gaussian(750, 75, 450, 1050), () -> true, true),
-        PREPARE_MENU_HOVER(RngUtil.gaussian(750, 75, 450, 1050), () -> {
-            // Do not hover Ardy knights, too large menu if too many people.
-            NPC target = PickpocketUtil.getPickpocketTarget();
-            return target != null && !target.getName().equalsIgnoreCase("Knight of Ardougne");
-        }, true),
-        DROP_JUNK(RngUtil.gaussian(1000, 250, 300, 1700), () ->
-                globalMethodProvider.inventory.contains(junk)
-                , false),
-        // Todo: implement after I get access
-        CAST_SHADOW_VEIL(RngUtil.gaussian(1000, 250, 300, 1700), () -> true, false);
-
-
-        final int executionWeight;
-        final Callable<Boolean> canRun;
-        final boolean isTerminal;
-
-        MidStunActions(int executionWeight, Callable<Boolean> canRun, boolean isTerminal) {
-            this.executionWeight = executionWeight;
-            this.canRun = canRun;
-            this.isTerminal = isTerminal;
-        }
     }
 }
