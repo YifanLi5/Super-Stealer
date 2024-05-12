@@ -66,7 +66,7 @@ public class MidStunUtil {
         ScriptPaint.setStatus("MidStun - spam pickpocket");
         while (isPlayerStunned()) {
             PickpocketUtil.pickpocketTarget();
-            sleep(RngUtil.gaussian(325, 50, 0, 450));
+            sleep(RngUtil.gaussian(PickPocketCadenceUtil.ppMean, PickPocketCadenceUtil.ppStddev, 0, 1000));
         }
     }
 

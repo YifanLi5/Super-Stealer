@@ -22,6 +22,9 @@ public class MainScript extends Script {
     NPCSelectionPainter selectionPainter;
     MessageListener svMessageListener;
 
+    public static final int onLoopMean = random(300, 600);
+    public static final int onLoopStddev = random(75, 250);
+
     @Override
     public void onStart() throws InterruptedException {
         super.onStart();
@@ -36,8 +39,6 @@ public class MainScript extends Script {
             stop(false);
             return;
         }
-
-
 
         boolean isNPCAtkHidden = configs.isSet(1306, 3);
         log("isNPCAtkHidden: " + isNPCAtkHidden);
@@ -97,7 +98,8 @@ public class MainScript extends Script {
         // other setup
         tabs.open(Tab.INVENTORY);
         settings.setRunning(true);
-        camera.movePitch(67);
+
+        log(String.format("Using mean: %d / stddev: %d for onLoop", PickPocketCadenceUtil.ppMean, PickPocketCadenceUtil.ppStddev));
     }
 
     @Override
@@ -111,7 +113,7 @@ public class MainScript extends Script {
         if (task != null) {
             task.runTask();
         }
-        return RngUtil.gaussian(250, 50, 0, 350);
+        return RngUtil.gaussian(PickPocketCadenceUtil.ppMean, PickPocketCadenceUtil.ppStddev, 0, 1000);
     }
 
     @Override
