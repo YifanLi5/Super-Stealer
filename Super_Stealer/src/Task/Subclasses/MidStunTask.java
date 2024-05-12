@@ -10,15 +10,17 @@ import org.osbot.rs07.api.model.NPC;
 import org.osbot.rs07.api.ui.Skill;
 import org.osbot.rs07.utility.ConditionalSleep2;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 import static Util.GlobalMethodProvider.globalMethodProvider;
 
 public class MidStunTask extends Task {
 
     private final static String[] junk = {"Jug", "Bowl", "Vial"};
-    private final HashSet<MidStunActions> validActions = new HashSet<>();
     private int eatAtHpPercentage;
 
     public MidStunTask(Bot bot) throws InterruptedException {
@@ -33,13 +35,7 @@ public class MidStunTask extends Task {
         }
         log(builder);
 
-        validActions.add(MidStunActions.EXTENDED_NO_OP);
-        validActions.add(MidStunActions.SPAM_PICKPOCKET);
 
-        // Too many players at mass ardy knight splash world result in very large menu.
-        NPC target = PickpocketUtil.getPickpocketTarget();
-        if (target != null && !target.getName().equalsIgnoreCase("Knight of Ardougne"))
-            validActions.add(MidStunActions.PREPARE_MENU_HOVER);
 
         this.eatAtHpPercentage = RngUtil.gaussian(50, 10, 35, 70);
         log("initial eatAtHpPercentage -> " + this.eatAtHpPercentage);
@@ -95,19 +91,15 @@ public class MidStunTask extends Task {
     }
 
     private MidStunActions rollForAction() {
-        try {
-            if (MidStunActions.EAT.canRun.call())
-                validActions.add(MidStunActions.EAT);
-            else validActions.remove(MidStunActions.EAT);
 
-            if (MidStunActions.DROP_JUNK.canRun.call())
-                validActions.add(MidStunActions.DROP_JUNK);
-            else validActions.remove(MidStunActions.DROP_JUNK);
-
-        } catch (Exception e) {
-            stopScriptNow("Got exception when attempting to use canRun Callable of MidStunActions enum.");
-            return null;
-        }
+        List<MidStunActions> validActions = Arrays.stream(MidStunActions.values()).filter(action -> {
+            try {
+                return action.canRun.call();
+            } catch (Exception e) {
+                stopScriptNow(String.format("Got exception %s get valid mid stun actions.", e.getClass().getSimpleName()));
+                return false;
+            }
+        }).collect(Collectors.toList());
 
         MidStunActions selectedAction = null;
         int weightSum = validActions.stream()
@@ -143,7 +135,11 @@ public class MidStunTask extends Task {
         NO_OP(RngUtil.gaussian(500, 100, 300, 700), () -> true, true),
         EXTENDED_NO_OP(RngUtil.gaussian(50, 25, 0, 150), () -> true, true),
         SPAM_PICKPOCKET(RngUtil.gaussian(750, 75, 450, 1050), () -> true, true),
-        PREPARE_MENU_HOVER(RngUtil.gaussian(750, 75, 450, 1050), () -> true, true),
+        PREPARE_MENU_HOVER(RngUtil.gaussian(750, 75, 450, 1050), () -> {
+            // Do not hover Ardy knights, too large menu if too many people.
+            NPC target = PickpocketUtil.getPickpocketTarget();
+            return target != null && !target.getName().equalsIgnoreCase("Knight of Ardougne");
+        }, true),
         DROP_JUNK(RngUtil.gaussian(1000, 250, 300, 1700), () ->
                 globalMethodProvider.inventory.contains(junk)
                 , false),

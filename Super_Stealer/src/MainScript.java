@@ -96,7 +96,7 @@ public class MainScript extends Script {
         tabs.open(Tab.INVENTORY);
         settings.setRunning(true);
 
-        log(String.format("Using mean: %d / stddev: %d for onLoop", PickPocketCadenceUtil.ppMean, PickPocketCadenceUtil.ppStddev));
+        log(String.format("Using mean: %d / stddev: %d for onLoop", RngUtil.ppMean, RngUtil.ppStddev));
     }
 
     @Override
@@ -110,7 +110,7 @@ public class MainScript extends Script {
         if (task != null) {
             task.runTask();
         }
-        return RngUtil.gaussian(PickPocketCadenceUtil.ppMean, PickPocketCadenceUtil.ppStddev, 0, 1000);
+        return RngUtil.ppCadenceGaussian();
     }
 
     @Override
