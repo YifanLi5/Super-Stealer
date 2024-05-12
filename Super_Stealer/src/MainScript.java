@@ -22,9 +22,6 @@ public class MainScript extends Script {
     NPCSelectionPainter selectionPainter;
     MessageListener svMessageListener;
 
-    public static final int onLoopMean = random(300, 600);
-    public static final int onLoopStddev = random(75, 250);
-
     @Override
     public void onStart() throws InterruptedException {
         super.onStart();
