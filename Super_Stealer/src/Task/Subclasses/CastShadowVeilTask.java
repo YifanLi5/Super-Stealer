@@ -26,6 +26,10 @@ public class CastShadowVeilTask extends Task implements MessageListener {
             return false;
         }
         RS2Widget shadowVeilSpellWidget = globalMethodProvider.widgets.singleFilter(218, rs2Widget -> rs2Widget.getSpellName().contains("Shadow Veil"));
+        if (shadowVeilSpellWidget == null || shadowVeilSpellWidget.isHidden()) {
+            globalMethodProvider.log("Shadow veil is not castable.");
+            return false;
+        }
         if (shadowVeilSpellWidget.getSpriteIndex1() == 1334 || globalMethodProvider.skills.getStatic(Skill.MAGIC) < 47) {
             globalMethodProvider.log("Unable to cast Shadow veil, Widget is using blacked out || is on cooldown || < 47 magic, ");
             return false;

@@ -1,5 +1,6 @@
 import Task.Subclasses.*;
 import Task.Subclasses.Failsafes.EmergencyEat;
+import Task.Subclasses.Failsafes.RunAway;
 import Task.Task;
 import UI.NPCSelectionPainter;
 import UI.ScriptPaint;
@@ -24,19 +25,17 @@ public class MainScript extends Script {
     @Override
     public void onStart() throws InterruptedException {
         super.onStart();
-        int emptySlotsNeeded = 2;
+        int emptySlotsNeeded = 3;
         if (inventory.contains("Coins"))
             emptySlotsNeeded--;
         if (inventory.contains("Coin pouch"))
             emptySlotsNeeded--;
         if (inventory.getEmptySlots() < emptySlotsNeeded) {
-            warn("You need room for coin pouch + coins." +
+            warn("You need room for coin pouch + coins + 1 extra slot." +
                     "\nMake some space then restart.");
             stop(false);
             return;
         }
-
-
 
         boolean isNPCAtkHidden = configs.isSet(1306, 3);
         log("isNPCAtkHidden: " + isNPCAtkHidden);
@@ -71,6 +70,7 @@ public class MainScript extends Script {
 
         // high -> low priority of tasks
         new EmergencyEat(this.bot);
+        //new RunAway(this.bot);
 
         NPC pickpocketTarget = PickpocketUtil.getPickpocketTarget();
         if (Banks.ARDOUGNE_SOUTH.contains(myPosition())) {
@@ -95,7 +95,8 @@ public class MainScript extends Script {
         // other setup
         tabs.open(Tab.INVENTORY);
         settings.setRunning(true);
-        camera.movePitch(67);
+
+        log(String.format("Using mean: %d / stddev: %d for onLoop", RngUtil.ppMean, RngUtil.ppStddev));
     }
 
     @Override
@@ -109,7 +110,7 @@ public class MainScript extends Script {
         if (task != null) {
             task.runTask();
         }
-        return RngUtil.gaussian(250, 50, 0, 350);
+        return RngUtil.ppCadenceGaussian();
     }
 
     @Override

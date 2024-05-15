@@ -46,10 +46,5 @@ public class PickpocketTask extends Task {
             script.warn("Multiple pickpocket interactions failed.");
             script.stop(LOGOUT_ON_SCRIPT_STOP);
         }
-
-//        if(!PickpocketUtil.isPlayerAdjacentToPickpocketNPC()) {
-//            PickpocketUtil.menuHoverPickpocketOption();
-//        }
-        //ConditionalSleep2.sleep(5000, () -> myPlayer().isAnimating());
     }
 }
